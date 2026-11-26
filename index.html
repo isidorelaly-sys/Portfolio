@@ -589,6 +589,15 @@ footer .frow a:hover{color:var(--cream)}
 #lb p{font-size:14px;color:rgba(244,239,231,.84)}
 #lb .copy{color:var(--cream)}
 
+/* Bouton WhatsApp flottant */
+.wa{position:fixed;z-index:52;right:calc(18px + env(safe-area-inset-right,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:10px;background:#1FA855;color:#fff;text-decoration:none;font:700 15px var(--f-body);padding:13px 20px 13px 15px;border-radius:999px;transition:transform .5s var(--ease),background .3s}
+.wa svg{width:24px;height:24px;flex:none}
+.wa::before{content:"";position:absolute;inset:0;border-radius:inherit;background:#1FA855;z-index:-1;animation:waPulse 2.6s var(--ease) infinite}
+@keyframes waPulse{from{transform:scale(1);opacity:.55}to{transform:scale(1.45);opacity:0}}
+.wa:hover{background:#178F47}
+.wa:focus-visible{outline-color:var(--ink)}
+@media (max-width:640px){.wa span{display:none}.wa{padding:14px}}
+
 .morph [data-bg]{background-color:transparent!important}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}html{scroll-behavior:auto}.ltr{transform:none}}
 </style>
@@ -1473,6 +1482,8 @@ footer .frow a:hover{color:var(--cream)}
   </div>
 </footer>
 
+<a class="wa" href="https://wa.me/2290197978771?text=Bonjour%20Isidore%2C%20j%27ai%20consult%C3%A9%20votre%20portfolio." target="_blank" rel="noopener" aria-label="Écrire sur WhatsApp" data-cursor="Écrire"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.3 7.5L3 21l2-5.5A8.4 8.4 0 1 1 21 11.5z"/><path d="M9 9.5c.3 1.6 1.9 3.6 3.6 4.4l1.2-1.1 2 .9-.5 1.7c-3.1.3-7.3-3.8-7-7l1.7-.5.9 2z" fill="currentColor" stroke="none"/></svg><span>WhatsApp</span></a>
+
 <dialog id="pal" aria-label="Navigation rapide">
   <div class="in"><i aria-hidden="true"></i><input id="pal-q" type="text" placeholder="Aller à… (audit, Gantt, indicateurs, contact)" autocomplete="off" aria-label="Rechercher une section"></div>
   <ul id="pal-list" role="listbox"></ul>
@@ -1604,7 +1615,7 @@ footer .frow a:hover{color:var(--cream)}
     (function mv(){px+=(cx-px)*.22;py+=(cy-py)*.22;cur.style.transform="translate3d("+px+"px,"+py+"px,0)";requestAnimationFrame(mv);})();
     document.addEventListener("pointerover",function(e){var t=e.target.closest&&e.target.closest("[data-cursor],[data-zoom],a,button,.g-bar");cur.classList.remove("big","link");if(!t)return;
       var l=t.getAttribute("data-cursor");if(l||t.hasAttribute("data-zoom")){lab.textContent=l||"Voir";cur.classList.add("big");}else cur.classList.add("link");});
-    $$(".btn,.menu-btn,.pcard .go i").forEach(function(b){b.addEventListener("pointermove",function(e){var r=b.getBoundingClientRect();b.style.transform="translate("+((e.clientX-r.left-r.width/2)*.25)+"px,"+((e.clientY-r.top-r.height/2)*.35)+"px)";});
+    $$(".btn,.menu-btn,.pcard .go i,.wa").forEach(function(b){b.addEventListener("pointermove",function(e){var r=b.getBoundingClientRect();b.style.transform="translate("+((e.clientX-r.left-r.width/2)*.25)+"px,"+((e.clientY-r.top-r.height/2)*.35)+"px)";});
       b.addEventListener("pointerleave",function(){b.style.transform="";});});
   }else if(cur)cur.remove();
 
