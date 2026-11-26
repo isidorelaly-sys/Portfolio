@@ -1,0 +1,1757 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23FF5B2E'/%3E%3Ccircle cx='32' cy='32' r='11' fill='%230E0C14'/%3E%3C/svg%3E">
+<title>Isidore Laly · Portfolio</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Isidore Laly, chef de projet marketing digital 360° : de l'audit au tableau de bord.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Instrument+Sans:wght@400..700&display=swap">
+<style>
+/* Layout : un portfolio en mouvement. Héros plein écran sur un fluide de couleurs (WebGL) qui suit la souris,
+   bandeaux qui défilent selon la vitesse de scroll, méthode en défilement horizontal épinglé, cartes projets qui s'empilent,
+   fond de page qui change de couleur d'une section à l'autre, transitions de page en volet coloré.
+   Chaque page a sa couleur : accueil et formation papaye, Nettivert lagon, parcours lilas, contact soleil.
+   Une seule ambiance assumée : encre profonde, crème pour la lecture, aplats de couleurs vives. */
+:root{
+  color-scheme:dark;
+  --ink:#0E0C14; --ink-2:#1B1824; --cream:#F4EFE7; --paper:#FFFFFF;
+  --papaya:#FF5B2E; --lilac:#A98BFF; --lagoon:#18C8A0; --sun:#FFCF3A; --rose:#FF7AB6;
+  --ok:#12A37F; --bad:#E8452A;
+  --fg:var(--cream); --dim:rgba(244,239,231,.74); --line:rgba(244,239,231,.14); --surface:rgba(244,239,231,.05);
+  --world:var(--papaya);
+  --f-disp:"Bricolage Grotesque","Arial Black",system-ui,sans-serif;
+  --f-body:"Instrument Sans","Helvetica Neue",Arial,system-ui,sans-serif;
+  --ease:cubic-bezier(.16,1,.3,1);
+  --gut-l:max(18px,env(safe-area-inset-left,0px)); --gut-r:max(18px,env(safe-area-inset-right,0px));
+  --top:env(safe-area-inset-top,0px);
+}
+.light{--fg:var(--ink);--dim:#5B5566;--line:rgba(14,12,20,.12);--surface:var(--paper);background-color:var(--cream);color:var(--ink)}
+.on-color{--fg:var(--ink);--dim:rgba(14,12,20,.78);--line:rgba(14,12,20,.2);--surface:rgba(255,255,255,.28);color:var(--ink)}
+
+*{box-sizing:border-box}
+html{overflow-x:clip;scroll-behavior:smooth;scroll-padding-top:calc(var(--top) + 130px)}
+html.lock{overflow:hidden}
+body{margin:0;background-color:var(--ink);color:var(--fg);font:400 16.5px/1.6 var(--f-body);-webkit-font-smoothing:antialiased;overflow-x:clip;transition:background-color .8s var(--ease)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:var(--top);z-index:60;background:var(--ink)}
+::selection{background:var(--sun);color:var(--ink)}
+a{color:inherit}
+img{max-width:100%;display:block}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--sun);outline-offset:3px;border-radius:6px}
+.light :focus-visible,.on-color :focus-visible{outline-color:var(--ink)}
+h1,h2,h3,h4{font-family:var(--f-disp);margin:0;text-wrap:balance;color:var(--fg)}
+h1{font-weight:800;font-size:clamp(42px,6vw,92px);line-height:.95;letter-spacing:-.045em}
+h2{font-weight:800;font-size:clamp(32px,3.8vw,58px);line-height:1;letter-spacing:-.035em}
+h3{font-weight:700;font-size:clamp(20px,1.4vw + 12px,26px);line-height:1.15;letter-spacing:-.015em}
+h4{font-weight:700;font-size:18px;line-height:1.25;letter-spacing:-.01em}
+p{margin:0}
+.wrap{max-width:1320px;margin:0 auto;padding-left:var(--gut-l);padding-right:var(--gut-r)}
+.prose{max-width:64ch;color:var(--dim)}
+.prose b,.prose strong{color:var(--fg);font-weight:600}
+.cap{font-size:13px;color:var(--dim)}
+.hl{font-style:normal;color:var(--world)}
+.light .hl{color:var(--ink);background:linear-gradient(transparent 60%,var(--world) 60%,var(--world) 92%,transparent 92%);-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.on-color .hl,.dossier-h .hl,.contact-h .hl{color:var(--world);background:var(--ink);padding:0 .12em;border-radius:.12em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+
+/* ---------- Curseur, volet, progression ---------- */
+#cursor{position:fixed;left:0;top:0;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:#fff;mix-blend-mode:difference;pointer-events:none;z-index:100;display:grid;place-items:center;opacity:0;transition:width .4s var(--ease),height .4s var(--ease),margin .4s var(--ease),background .3s}
+#cursor span{font:700 12px var(--f-body);color:var(--ink);opacity:0;transition:opacity .2s;white-space:nowrap}
+#cursor.link{width:46px;height:46px;margin:-23px 0 0 -23px}
+#cursor.big{width:92px;height:92px;margin:-46px 0 0 -46px;background:var(--sun);mix-blend-mode:normal}
+#cursor.big span{opacity:1}
+@media (pointer:coarse){#cursor{display:none}}
+#wipe{position:fixed;inset:0;z-index:80;background:var(--wc,var(--papaya));transform:translateY(101%);pointer-events:none;display:grid;place-items:center;color:var(--ink)}
+#wipe span{font:800 clamp(56px,12vw,200px)/1 var(--f-disp);letter-spacing:-.05em}
+#wipe.cover{transform:translateY(0);transition:transform .5s var(--ease)}
+#wipe.cover.leave{transform:translateY(-101%);transition:transform .65s var(--ease)}
+.progress{position:fixed;left:0;top:var(--top);height:3px;pointer-events:none;width:100%;transform-origin:0 50%;transform:scaleX(0);background:var(--world);z-index:55}
+
+/* ---------- En-tête : pastilles flottantes ---------- */
+.hud{position:fixed;top:0;left:0;right:0;z-index:50;padding-top:var(--top);pointer-events:none}
+.hud .wrap{display:flex;align-items:center;gap:8px;height:76px}
+.hud .wrap > *{pointer-events:auto}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;font:800 17px var(--f-disp);letter-spacing:-.02em;background:var(--ink);color:var(--cream);padding:11px 18px;border-radius:999px}
+.logo i{width:10px;height:10px;border-radius:50%;background:var(--world);animation:beat 2.4s var(--ease) infinite}
+@keyframes beat{50%{transform:scale(.55)}}
+.nav{display:flex;gap:2px;margin-left:auto;background:var(--ink);border-radius:999px;padding:5px}
+.nav a{text-decoration:none;font:500 14.5px var(--f-body);padding:8px 14px;border-radius:999px;color:rgba(244,239,231,.82);transition:background .3s,color .3s}
+.nav a:hover{color:var(--cream);background:rgba(244,239,231,.1)}
+.nav a[aria-current="page"]{background:var(--world);color:var(--ink)}
+.clock{font:500 13px var(--f-body);white-space:nowrap;font-variant-numeric:tabular-nums;background:var(--ink);color:rgba(244,239,231,.82);padding:11px 15px;border-radius:999px}
+.clock b{color:var(--cream)}
+.search-btn{border:0;background:var(--ink);color:var(--cream);cursor:pointer;font:500 14px var(--f-body);display:flex;gap:8px;align-items:center;padding:10px 15px;border-radius:999px}
+.search-btn kbd{font:600 11px var(--f-body);border:1px solid rgba(244,239,231,.4);border-radius:5px;padding:1px 5px}
+.menu-btn{border:0;border-radius:999px;background:var(--world);color:var(--ink);padding:12px 20px;font:700 14px var(--f-body);cursor:pointer}
+@media (max-width:1100px){.clock{display:none}}
+@media (max-width:980px){.nav,.search-btn{display:none}.menu-btn{margin-left:auto}}
+
+/* Menu plein écran */
+#menu{position:fixed;inset:0;z-index:45;background:var(--ink);color:var(--cream);display:grid;grid-template-rows:1fr auto;padding:calc(var(--top) + 100px) var(--gut-r) calc(28px + env(safe-area-inset-bottom,0px)) var(--gut-l);clip-path:circle(0% at calc(100% - 60px) 34px);visibility:hidden;transition:clip-path .9s var(--ease),visibility 0s .9s}
+#menu.open{clip-path:circle(160% at calc(100% - 60px) 34px);visibility:visible;transition:clip-path .9s var(--ease),visibility 0s}
+#menu nav{display:grid;align-content:center;gap:2px;max-width:1320px;margin:0 auto;width:100%}
+#menu nav a{display:flex;align-items:baseline;gap:18px;text-decoration:none;font:800 clamp(46px,9vw,124px)/1 var(--f-disp);letter-spacing:-.05em;transform:translateY(40px);opacity:0;transition:transform .8s var(--ease),opacity .6s,color .3s}
+#menu nav a small{font:600 14px var(--f-body);letter-spacing:0;color:var(--dim)}
+#menu.open nav a{transform:none;opacity:1}
+#menu.open nav a:nth-child(2){transition-delay:.06s}#menu.open nav a:nth-child(3){transition-delay:.12s}#menu.open nav a:nth-child(4){transition-delay:.18s}#menu.open nav a:nth-child(5){transition-delay:.24s}
+#menu nav a:nth-child(1):hover{color:var(--papaya)}#menu nav a:nth-child(2):hover{color:var(--sun)}#menu nav a:nth-child(3):hover{color:var(--lagoon)}#menu nav a:nth-child(4):hover{color:var(--lilac)}#menu nav a:nth-child(5):hover{color:var(--rose)}
+#menu nav a[aria-current="page"]{color:var(--world)}
+.menu-foot{display:flex;flex-wrap:wrap;gap:10px 28px;justify-content:space-between;font-size:15px;color:var(--dim);max-width:1320px;margin:0 auto;width:100%}
+
+/* ---------- Primitives ---------- */
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font:600 13px var(--f-body);letter-spacing:.14em;text-transform:uppercase;color:var(--fg)}
+.eyebrow::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--world)}
+.on-color .eyebrow::before{background:var(--ink)}
+.sec{padding-block:clamp(64px,8vw,120px)}
+.sec-h{display:grid;gap:14px;margin-bottom:clamp(28px,4vw,48px)}
+.sec-h p{max-width:62ch;color:var(--dim)}
+.panel{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:clamp(18px,2.4vw,28px)}
+.tag{display:inline-flex;align-items:center;gap:7px;font:600 13px var(--f-body);padding:5px 13px;border-radius:999px;background:color-mix(in srgb,var(--fg) 9%,transparent);color:var(--fg);white-space:nowrap}
+.tag.gold{background:var(--sun);color:var(--ink)}
+.tag.pale{background:var(--lilac);color:var(--ink)}
+.tag.brand{background:color-mix(in srgb,var(--world) 26%,transparent);color:var(--fg)}
+.tag.ok::before,.tag.bad::before{content:"";width:8px;height:8px;border-radius:50%;flex:none}
+.tag.ok::before{background:var(--ok)} .tag.bad::before{background:var(--bad)}
+.btn{display:inline-flex;align-items:center;gap:12px;text-decoration:none;cursor:pointer;font:600 15px var(--f-body);padding:15px 24px;border-radius:999px;border:1.5px solid currentColor;background:transparent;color:var(--fg);transition:background .3s,color .3s,transform .5s var(--ease)}
+.btn:hover{background:var(--fg);color:var(--ink)}
+.light .btn:hover,.on-color .btn:hover{color:var(--cream)}
+.btn.prime{background:var(--world);border-color:var(--world);color:var(--ink)}
+.btn.prime:hover{background:var(--cream);border-color:var(--cream);color:var(--ink)}
+.light .btn.prime,.on-color .btn.prime{background:var(--ink);border-color:var(--ink);color:var(--cream)}
+.light .btn.prime:hover,.on-color .btn.prime:hover{background:var(--world);border-color:var(--world);color:var(--ink)}
+.btn .arr{display:inline-block;transition:transform .4s var(--ease)}
+.btn:hover .arr{transform:translateX(5px) rotate(-12deg)}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:980px){.g4{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:640px){.g2,.g3,.g4{grid-template-columns:minmax(0,1fr)}}
+.split{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:clamp(20px,4vw,56px);align-items:start}
+@media (max-width:860px){.split{grid-template-columns:minmax(0,1fr)}}
+.list{display:grid;gap:12px;margin:0;padding:0;list-style:none}
+.list li{display:grid;grid-template-columns:16px minmax(0,1fr);gap:10px;color:var(--dim)}
+.list li::before{content:"";width:9px;height:9px;border-radius:50%;margin-top:9px;background:var(--world)}
+.list li b{color:var(--fg);font-weight:600}
+.k{font:600 12.5px var(--f-body);letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.hexnum{display:grid;place-items:center;width:58px;height:58px;border-radius:50%;background:var(--world);color:var(--ink);font:800 24px var(--f-disp);flex:none}
+
+/* Apparitions au défilement */
+.js .pre{transform:translateY(56px);opacity:.12}
+.js .in{transform:none;opacity:1;transition:transform 1.1s var(--ease),opacity .9s}
+.split-words .w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.08em;margin-bottom:-.08em}
+.split-words .w > span{display:inline-block;transform:translateY(110%);transition:transform 1s var(--ease);transition-delay:calc(var(--i) * 40ms)}
+.split-words.in .w > span{transform:none}
+.split-words.pre{transform:none;opacity:1}
+
+/* ---------- Héros ---------- */
+.hero{position:relative;overflow:hidden;color:var(--ink);padding-block:calc(var(--top) + 120px) 56px;
+  background:radial-gradient(60% 70% at 15% 20%,var(--sun),transparent 60%),radial-gradient(60% 70% at 85% 30%,var(--lilac),transparent 60%),radial-gradient(70% 80% at 50% 100%,var(--lagoon),transparent 60%),var(--papaya)}
+#fluid{position:absolute;inset:0;width:100%;height:100%;display:block}
+.hero-in{position:relative;z-index:1}
+.hero-top{display:flex;flex-wrap:wrap;gap:6px 28px;font:600 13px var(--f-body);letter-spacing:.14em;text-transform:uppercase}
+.hero-top span{display:inline-flex;align-items:center;gap:8px}
+.hero-top span:first-child::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--ink);animation:beat 2.4s var(--ease) infinite}
+.giant{font:800 clamp(72px,15.5vw,250px)/.84 var(--f-disp);letter-spacing:-.06em;margin:28px 0 34px;color:var(--ink)}
+.giant .line{display:block;overflow:hidden;padding-bottom:.06em}
+.giant .l2{display:flex;align-items:center;justify-content:flex-end;gap:.1em}
+.ltr{display:inline-block;transform:translateY(108%) rotate(8deg);animation:ltr 1.2s var(--ease) forwards;animation-delay:calc(var(--i) * 55ms + .15s)}
+@keyframes ltr{to{transform:none}}
+.blob{width:.9em;height:.9em;flex:none;overflow:hidden;border-radius:42% 58% 63% 37% / 41% 44% 56% 59%;animation:morph 10s ease-in-out infinite,pop 1.2s var(--ease) .5s both;border:.03em solid var(--ink)}
+.blob img{width:100%;height:100%;object-fit:cover;object-position:50% 15%}
+@keyframes morph{0%,100%{border-radius:42% 58% 63% 37% / 41% 44% 56% 59%}33%{border-radius:63% 37% 38% 62% / 55% 62% 38% 45%}66%{border-radius:35% 65% 52% 48% / 38% 41% 59% 62%}}
+@keyframes pop{from{transform:scale(.2) rotate(-30deg)}to{transform:none}}
+.hero-bottom{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:28px;align-items:end}
+.hero .lede{font:500 clamp(18px,.6vw + 14px,22px)/1.45 var(--f-body);max-width:44ch}
+.cta{display:flex;flex-wrap:wrap;gap:12px}
+@media (max-width:820px){.hero-bottom{grid-template-columns:minmax(0,1fr)}.giant .l2{justify-content:flex-start}}
+
+/* Bandeaux défilants */
+.marquee{overflow:hidden;background:var(--ink);color:var(--cream);padding-block:20px;border-block:1px solid rgba(244,239,231,.1)}
+.mq-track{display:flex;width:max-content;will-change:transform}
+.mq-track > span{display:flex;align-items:center;gap:.4em;padding-right:.4em;font:800 clamp(38px,6.2vw,92px)/1.05 var(--f-disp);letter-spacing:-.04em;white-space:nowrap}
+.mq-track > span em{font-style:normal;color:transparent;-webkit-text-stroke:1.5px currentColor}
+.mq-track > span i{width:.42em;height:.42em;border-radius:50%;background:var(--c);flex:none}
+
+/* Chiffres */
+.stats{background-color:var(--ink);padding-block:clamp(72px,9vw,130px)}
+.stats .grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:28px}
+.stat-big b{display:block;font:800 clamp(52px,6.6vw,104px)/.95 var(--f-disp);letter-spacing:-.05em;color:var(--c);font-variant-numeric:tabular-nums}
+.stat-big span{display:block;margin-top:12px;color:var(--dim);font-size:16px;max-width:22ch}
+@media (max-width:860px){.stats .grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Méthode : défilement horizontal épinglé */
+.hs{position:relative;background-color:var(--ink)}
+.hs-pin{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;display:flex;flex-direction:column;justify-content:center;gap:clamp(24px,4vh,44px);padding-top:calc(var(--top) + 40px)}
+.hs-head{display:flex;justify-content:space-between;align-items:end;gap:24px;flex-wrap:wrap;width:100%}
+.hs-head h2{max-width:16ch}
+.hs-head p{color:var(--dim);max-width:40ch}
+.hs-track{display:flex;gap:22px;padding-left:var(--gut-l);padding-right:var(--gut-r);width:max-content;will-change:transform}
+.phase{flex:none;width:min(400px,80vw);height:min(470px,58vh);border-radius:30px;padding:28px;background:var(--c);color:var(--ink);display:flex;flex-direction:column;justify-content:space-between;gap:16px;cursor:pointer;border:0;text-align:left;transition:transform .6s var(--ease)}
+.phase:hover{transform:translateY(-8px) rotate(-1.5deg)}
+.phase .num{font:800 clamp(96px,10vw,150px)/.8 var(--f-disp);letter-spacing:-.07em}
+.phase small{font:600 13px var(--f-body);letter-spacing:.12em;text-transform:uppercase}
+.phase h3{font:800 clamp(34px,3vw,46px)/1 var(--f-disp);letter-spacing:-.04em;color:var(--ink);margin:6px 0 8px}
+.phase p{font-size:16px;line-height:1.45}
+.phase.end{background:transparent;color:var(--cream);border:1.5px solid rgba(244,239,231,.25);justify-content:center}
+.phase.end p{font:700 clamp(22px,1.6vw + 10px,30px)/1.2 var(--f-disp);letter-spacing:-.02em}
+.hs-progress{height:3px;background:rgba(244,239,231,.14);border-radius:3px;overflow:hidden}
+.hs-progress i{display:block;height:100%;background:var(--world);transform-origin:0 50%;transform:scaleX(0)}
+.hs.flat .hs-pin{position:static;height:auto;padding-block:clamp(64px,8vw,110px)}
+.hs.flat .hs-track{width:auto;max-width:100%;overflow-x:auto;scroll-snap-type:x mandatory;transform:none!important;padding-bottom:12px;scrollbar-width:none}
+.hs.flat .hs-track::-webkit-scrollbar{display:none}
+.hs.flat .phase{scroll-snap-align:start;height:auto;min-height:400px}
+.hs.flat .hs-progress{display:none}
+
+/* Projets empilés */
+.projects{padding-block:clamp(64px,8vw,120px)}
+.stackcards{display:grid;gap:36px}
+.pcard{position:sticky;top:calc(var(--top) + 96px);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:clamp(20px,3vw,40px);padding:clamp(22px,3vw,44px);border-radius:34px;background:var(--pc);color:var(--ink);text-decoration:none;min-height:min(580px,78vh);transform-origin:50% 0;will-change:transform;--fg:var(--ink);--dim:rgba(14,12,20,.78);--line:rgba(14,12,20,.2)}
+.pcard .txt{display:flex;flex-direction:column;gap:18px}
+.pcard h3{font:800 clamp(36px,4.4vw,68px)/.95 var(--f-disp);letter-spacing:-.045em}
+.pcard p{color:var(--dim);font-size:17px}
+.pcard .row{display:flex;flex-wrap:wrap;gap:8px}
+.pcard .tag{background:var(--ink);color:var(--cream)}
+.pcard .go{margin-top:auto;display:inline-flex;align-items:center;gap:12px;font:700 18px var(--f-body)}
+.pcard .go i{width:46px;height:46px;border-radius:50%;background:var(--ink);color:var(--cream);display:grid;place-items:center;font-style:normal;transition:transform .5s var(--ease)}
+.pcard:hover .go i{transform:rotate(-45deg) scale(1.1)}
+.pcard .pimg{border-radius:22px;overflow:hidden;background:var(--paper);position:relative;min-height:260px}
+.pcard .pimg img{position:absolute;left:0;top:-8%;width:100%;height:116%;object-fit:cover;object-position:top;will-change:transform}
+@media (max-width:860px){.pcard{grid-template-columns:minmax(0,1fr);min-height:0}.pcard .pimg{aspect-ratio:16/10;min-height:0}}
+.minis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;border-top:1px solid var(--line);padding-top:16px}
+.minis b{display:block;font:800 clamp(20px,1.4vw + 10px,28px)/1.05 var(--f-disp);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.minis span{font-size:13.5px;color:var(--dim);line-height:1.35;display:block;margin-top:4px}
+
+/* Livrables défilants */
+.docs{background-color:var(--ink);padding-block:clamp(64px,8vw,120px);overflow:hidden}
+.drow{overflow:hidden;margin-top:18px}
+.drow .mq-track{gap:18px;padding-right:18px}
+.dthumb{flex:none;height:clamp(200px,24vw,320px);border-radius:16px;overflow:hidden;background:var(--paper);cursor:zoom-in;border:0;padding:0;transition:transform .6s var(--ease)}
+.dthumb img{height:100%;width:auto;max-width:none}
+.dthumb:hover{transform:scale(1.04) rotate(-1.2deg)}
+
+/* Terrain */
+.terrain{background-color:var(--sun);padding-block:clamp(72px,9vw,130px)}
+.terrain .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px;align-items:center}
+@media (max-width:860px){.terrain .wrap{grid-template-columns:minmax(0,1fr)}}
+.bigs{display:grid}
+.bigs > div{display:flex;align-items:baseline;justify-content:space-between;gap:16px;border-bottom:1.5px solid rgba(14,12,20,.2);padding-block:14px}
+.bigs b{font:800 clamp(48px,6.4vw,104px)/.95 var(--f-disp);letter-spacing:-.05em;font-variant-numeric:tabular-nums}
+.bigs span{font-size:16px;text-align:right;max-width:18ch}
+
+/* Appel final */
+.ctabig{background-color:var(--papaya);padding-block:clamp(80px,10vw,150px);overflow:hidden}
+.ctabig a{display:block;text-decoration:none;font:800 clamp(56px,11.5vw,200px)/.86 var(--f-disp);letter-spacing:-.06em;color:var(--ink)}
+.ctabig a span{display:inline-grid;place-items:center;width:.8em;height:.8em;border-radius:50%;background:var(--ink);color:var(--papaya);font-size:.5em;vertical-align:.1em;transition:transform .7s var(--ease)}
+.ctabig a:hover span{transform:rotate(-45deg) scale(1.08)}
+.ctabig p{margin-top:28px;font-size:18px;max-width:48ch}
+
+/* ---------- Pages de projet ---------- */
+[data-view="accueil"],[data-view="formation"]{--world:var(--papaya)}
+[data-view="nettivert"]{--world:var(--lagoon)}
+[data-view="parcours"]{--world:var(--lilac)}
+[data-view="contact"]{--world:var(--sun)}
+.dossier-h{position:relative;overflow:hidden;background:var(--world);color:var(--ink);padding-block:calc(var(--top) + 130px) clamp(48px,6vw,80px);--fg:var(--ink);--dim:rgba(14,12,20,.8);--line:rgba(14,12,20,.2)}
+.dossier-h::after{content:"";position:absolute;width:46vw;height:46vw;max-width:620px;max-height:620px;right:-10vw;top:-12vw;border-radius:42% 58% 63% 37% / 41% 44% 56% 59%;background:var(--ink);opacity:.08;animation:morph 12s ease-in-out infinite,drift 18s ease-in-out infinite alternate;pointer-events:none}
+@keyframes drift{to{transform:translate(-6vw,8vw) rotate(40deg)}}
+.dossier-h .wrap{position:relative;z-index:1}
+.dossier-h h1{margin:18px 0 22px;max-width:20ch}
+.dossier-h .prose{font-size:18px;color:var(--dim)}
+.note{font-size:14.5px;color:var(--dim);border-left:3px solid var(--world);padding-left:12px;max-width:70ch}
+.dossier-h .note{border-color:var(--ink)}
+.chips{position:sticky;top:calc(var(--top) + 68px);z-index:20;background:var(--ink);border-bottom:1px solid rgba(244,239,231,.1)}
+.chips .wrap{display:flex;gap:8px;overflow-x:auto;padding-block:10px;scrollbar-width:none}
+.chips .wrap::-webkit-scrollbar{display:none}
+.chips button{flex:none;cursor:pointer;display:flex;align-items:center;gap:8px;background:transparent;border:1.5px solid rgba(244,239,231,.2);border-radius:999px;padding:6px 14px 6px 6px;font:600 14px var(--f-body);color:var(--cream);transition:background .3s,border-color .3s,color .3s}
+.chips button i{font-style:normal;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:rgba(244,239,231,.12);font-size:12px}
+.chips button:hover{border-color:var(--world)}
+.chips button.on{background:var(--world);border-color:var(--world);color:var(--ink)}
+.chips button.on i{background:var(--ink);color:var(--world)}
+.chapter{padding-block:clamp(56px,7vw,96px);border-top:1px solid var(--line)}
+.ch-h{display:grid;gap:14px;margin-bottom:30px}
+.ch-h .idx{display:flex;align-items:center;gap:14px}
+.ch-h p{max-width:66ch;color:var(--dim);font-size:17px}
+.sub{margin:48px 0 18px;display:flex;align-items:center;gap:14px;font-size:22px}
+.sub::after{content:"";flex:1;height:1px;background:var(--line)}
+
+/* Documents */
+.figure{display:grid;gap:8px;background:none;border:0;padding:0;cursor:zoom-in;text-align:left;align-content:start}
+.figure .frame{border-radius:18px;overflow:hidden;border:1px solid var(--line);background:var(--paper);transition:transform .6s var(--ease)}
+.figure:hover .frame{transform:translateY(-6px) rotate(-.6deg)}
+.figure .cap{display:block}
+
+/* Tableaux */
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:18px;background:var(--paper)}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:15px;color:var(--ink)}
+th,td{padding:13px 16px;text-align:left;border-bottom:1px solid rgba(14,12,20,.1);vertical-align:top}
+th{font:600 13px var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--cream);background:var(--ink)}
+tr:last-child td{border-bottom:0}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td b{font-weight:600}
+td .tgt{font-weight:700;display:inline-flex;align-items:center;gap:7px}
+td .tgt::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--world)}
+td .muted{color:#6A6474}
+td .down{display:inline-flex;align-items:center;gap:6px;font-weight:600}
+td .down::after{content:"";border-left:5px solid transparent;border-right:5px solid transparent;border-top:7px solid var(--bad)}
+tbody tr{transition:background .2s}
+tbody tr:hover td{background:color-mix(in srgb,var(--world) 10%,transparent)}
+
+/* Chiffres et indicateurs */
+.metric{display:grid;gap:6px;align-content:start;justify-items:start}
+.metric .v{font:800 clamp(24px,1.2vw + 16px,34px)/1.05 var(--f-disp);letter-spacing:-.03em;font-variant-numeric:tabular-nums;color:var(--fg)}
+.metric .l{font-size:14.5px;color:var(--dim);line-height:1.4}
+.metric .arrow{color:var(--dim);font-weight:400;margin:0 4px}
+.kpi{display:grid;gap:10px;align-content:start}
+.kpi .top{display:grid;gap:8px;justify-items:start}
+.kpi .l{font-size:14.5px;color:var(--dim);line-height:1.3}
+.kpi .v{font:800 clamp(26px,1.2vw + 18px,36px)/1 var(--f-disp);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.kpi .s{font-size:13.5px;color:var(--dim)}
+.kpi .bar{height:8px;border-radius:8px;background:rgba(14,12,20,.08);overflow:hidden}
+.kpi .bar i{display:block;height:100%;border-radius:8px;background:var(--world)}
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+@media (max-width:1060px){.kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:640px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:400px){.kpis{grid-template-columns:minmax(0,1fr)}}
+
+/* Gantt */
+.gantt{overflow-x:auto;border:1px solid var(--line);border-radius:18px;background:var(--paper);padding:16px 18px;color:var(--ink)}
+.g-in{min-width:760px;display:grid;gap:4px}
+.g-row,.g-head{display:grid;grid-template-columns:220px minmax(0,1fr);gap:14px;align-items:center}
+.g-row{min-height:34px}
+.g-head{padding-bottom:8px;border-bottom:1px solid rgba(14,12,20,.12);margin-bottom:6px}
+.g-lab{font-size:14px;line-height:1.25}
+.g-lab b{font-weight:700;margin-right:8px;font-variant-numeric:tabular-nums}
+.g-cols{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr))}
+.g-cols span{font-size:12px;color:#6A6474;border-left:1px solid rgba(14,12,20,.12);padding-left:6px;font-variant-numeric:tabular-nums}
+.g-cols span b{display:block;color:var(--ink);font-weight:600}
+.g-axe{font:600 12.5px var(--f-body);letter-spacing:.1em;text-transform:uppercase;padding:12px 0 4px}
+.g-track{position:relative;height:24px;background:repeating-linear-gradient(90deg,transparent 0 calc(100% / var(--n) - 1px),rgba(14,12,20,.08) calc(100% / var(--n) - 1px) calc(100% / var(--n)))}
+.g-bar{position:absolute;top:3px;bottom:3px;border-radius:999px;background:var(--c);cursor:help;transform-origin:0 50%;transition:filter .2s}
+.g-bar:hover{filter:brightness(1.08) saturate(1.2)}
+.js .gantt.pre .g-bar,.js .gantt:not(.in) .g-bar{transform:scaleX(0)}
+.js .gantt.in .g-bar{transform:none;transition:transform 1.2s var(--ease)}
+.g-bar.m{background:repeating-linear-gradient(135deg,var(--c) 0 2px,transparent 2px 6px);opacity:.7;cursor:default}
+.g-ms{position:absolute;top:-6px;bottom:-6px;width:2px;background:var(--ink)}
+.g-ms::after{content:"Jour J";position:absolute;top:-8px;left:6px;font:700 11px var(--f-body);color:var(--ink);background:var(--sun);padding:1px 7px;border-radius:999px;white-space:nowrap}
+.legend{display:flex;flex-wrap:wrap;gap:16px;margin-top:12px;font-size:14px;color:var(--dim)}
+.legend i{display:inline-block;width:16px;height:10px;border-radius:999px;margin-right:7px;vertical-align:0;background:var(--c)}
+.legend i.h{background:repeating-linear-gradient(135deg,var(--ink) 0 2px,transparent 2px 5px);opacity:.6}
+#tip{position:fixed;z-index:90;max-width:300px;background:var(--ink);border-radius:14px;padding:11px 13px;font-size:13px;line-height:1.45;color:rgba(244,239,231,.84);pointer-events:none}
+#tip b{display:block;color:var(--cream);margin-bottom:3px}
+
+/* Budget */
+.stack{display:flex;height:52px;border-radius:999px;overflow:hidden;gap:3px}
+.stack div{display:flex;align-items:center;padding:0 16px;font:700 13px var(--f-body);white-space:nowrap;overflow:hidden;min-width:0}
+.c-pet{background:var(--lagoon);color:var(--ink)} .c-or{background:var(--papaya);color:var(--ink)} .c-nuit{background:var(--lilac);color:var(--ink)} .c-pale{background:var(--sun);color:var(--ink)} .c-ard{background:var(--ink);color:var(--cream)}
+.bleg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:16px}
+@media (max-width:760px){.bleg{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.bleg div{font-size:14px;color:var(--dim);line-height:1.35}
+.bleg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:7px}
+.bleg b{display:block;font:800 19px var(--f-disp);color:var(--fg);margin-top:4px;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+
+/* Bandeau fort */
+.signal{position:relative;overflow:hidden;border-radius:28px;padding:clamp(24px,3.4vw,44px);background:var(--ink);color:var(--cream);--fg:var(--cream);--dim:rgba(244,239,231,.78)}
+.signal::before{content:"";position:absolute;width:340px;height:340px;right:-90px;top:-120px;border-radius:42% 58% 63% 37% / 41% 44% 56% 59%;background:var(--world);opacity:.9;animation:morph 10s ease-in-out infinite,spin 30s linear infinite}
+@keyframes spin{to{rotate:360deg}}
+.signal > *{position:relative}
+.signal small{font:600 12.5px var(--f-body);letter-spacing:.14em;text-transform:uppercase;color:var(--world);display:block}
+.signal b{display:block;font:800 clamp(24px,1.6vw + 14px,40px)/1.08 var(--f-disp);letter-spacing:-.03em;margin:10px 0;color:var(--cream);max-width:26ch}
+.signal span,.signal p{color:rgba(244,239,231,.82)}
+.signal .big{font:800 clamp(56px,5vw + 24px,104px)/.9 var(--f-disp);letter-spacing:-.05em;color:var(--world);margin:0}
+.signal .lead{font-weight:700;color:var(--cream)}
+
+/* Démarrer / Arrêter / Continuer */
+.ssc{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media (max-width:760px){.ssc{grid-template-columns:minmax(0,1fr)}}
+.ssc > div{border-radius:22px;padding:20px;display:grid;gap:12px;align-content:start;justify-items:start;color:var(--ink)}
+.ssc .go{background:var(--lagoon)} .ssc .stop{background:var(--papaya)} .ssc .cont{background:var(--lilac)}
+.ssc .tag{background:var(--ink);color:var(--cream)}
+.ssc ul{margin:0;padding-left:18px;display:grid;gap:6px;font-size:15px}
+
+/* Cartes simples */
+.axis{display:grid;gap:10px;align-content:start;justify-items:start}
+.axis p{color:var(--dim);font-size:15.5px}
+.axis .fix{color:var(--fg);font-size:15px;font-weight:600;border-top:1px dashed var(--line);padding-top:10px;justify-self:stretch}
+
+/* Rétro-planning */
+.timeline{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
+.timeline > div{border-top:2px solid var(--line);padding-top:18px;position:relative}
+.timeline > div::before{content:"";position:absolute;top:-8px;left:0;width:14px;height:14px;border-radius:50%;background:var(--world)}
+.timeline > div.j::before{background:var(--ink);box-shadow:0 0 0 4px var(--sun)}
+.timeline b{font:800 20px var(--f-disp);display:block;letter-spacing:-.02em}
+.timeline em{font-style:normal;font:700 14px var(--f-body);font-variant-numeric:tabular-nums}
+.timeline p{font-size:14.5px;color:var(--dim);margin-top:6px;line-height:1.45}
+@media (max-width:900px){.timeline{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:24px}}
+
+/* Canaux */
+.chan{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:900px){.chan{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.chan > div{border:1px solid var(--line);border-radius:18px;padding:16px;background:var(--surface);transition:background .3s,transform .5s var(--ease)}
+.chan > div:hover{background:var(--world);transform:translateY(-4px)}
+.chan b{display:block;font-weight:700;margin-bottom:4px}
+.chan span{font-size:14px;color:var(--dim);line-height:1.4;display:block}
+
+/* Diaporama */
+.deck{display:grid;gap:12px}
+.deck .screen{border-radius:20px;overflow:hidden;border:1px solid var(--line);background:var(--ink);cursor:zoom-in;padding:0;display:block;width:100%;aspect-ratio:16/9}
+.deck .screen img{width:100%;height:100%;object-fit:contain}
+.deck .bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.deck .bar button{width:46px;height:46px;border-radius:50%;border:1.5px solid var(--fg);background:transparent;cursor:pointer;font-weight:700;transition:background .3s,color .3s}
+.deck .bar button:hover{background:var(--fg);color:var(--cream)}
+.deck .pos{font:800 18px var(--f-disp);font-variant-numeric:tabular-nums}
+.deck .t{flex:1;min-width:0;color:var(--dim);font-size:15px}
+.deck .strip{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.deck .strip button{flex:none;width:112px;aspect-ratio:16/9;border-radius:10px;overflow:hidden;border:2px solid transparent;padding:0;cursor:pointer;opacity:.55;background:var(--ink);transition:opacity .3s}
+.deck .strip button img{width:100%;height:100%;object-fit:cover}
+.deck .strip button[aria-current="true"]{opacity:1;border-color:var(--world)}
+
+/* Segments */
+.seg{display:grid;gap:12px;align-content:start}
+.seg .pct{font:800 56px/.9 var(--f-disp);letter-spacing:-.05em;font-variant-numeric:tabular-nums}
+.seg .meter{height:10px;border-radius:10px;background:rgba(14,12,20,.08);overflow:hidden}
+.seg .meter i{display:block;height:100%;border-radius:10px;background:var(--ink)}
+.seg p{font-size:15px;color:var(--dim)}
+.seg.target{background:var(--world);border-color:var(--world);--dim:rgba(14,12,20,.8)}
+
+/* Cercle d'or */
+.golden{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:32px;align-items:center}
+@media (max-width:820px){.golden{grid-template-columns:minmax(0,1fr)}}
+.rings{position:relative;width:min(340px,100%);aspect-ratio:1;margin:0 auto;animation:float 6s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-10px) rotate(2deg)}}
+.rings div{position:absolute;border-radius:50%;display:flex;justify-content:center;font:700 15px var(--f-body)}
+.rings .q{inset:0;background:var(--lilac);padding-top:7%;color:var(--ink)}
+.rings .c{inset:17%;background:var(--sun);padding-top:8%;color:var(--ink)}
+.rings .p{inset:35%;background:var(--ink);color:var(--cream);align-items:center}
+.golden dl{display:grid;gap:18px;margin:0}
+.golden dt{font:800 20px var(--f-disp);margin-bottom:4px;letter-spacing:-.02em}
+.golden dd{margin:0;color:var(--dim)}
+
+/* Plateforme */
+.uvp{font:600 clamp(20px,.9vw + 15px,28px)/1.3 var(--f-disp);letter-spacing:-.02em}
+.dl{display:grid;gap:14px;margin:0}
+.dl > div{display:grid;grid-template-columns:150px minmax(0,1fr);gap:16px;border-top:1px solid var(--line);padding-top:14px}
+@media (max-width:560px){.dl > div{grid-template-columns:minmax(0,1fr);gap:4px}}
+.dl dt{font:600 12.5px var(--f-body);letter-spacing:.1em;text-transform:uppercase;color:var(--dim);padding-top:3px}
+.dl dd{margin:0;color:var(--dim)}
+.dl dd b{color:var(--fg);font-weight:600}
+
+/* Phygital */
+.flow{display:grid;gap:10px}
+.flow .fr,.flow .fh{display:grid;grid-template-columns:minmax(0,1fr) 40px minmax(0,1fr) 40px minmax(0,1fr)}
+.flow .fr > div{border:1px solid var(--line);border-radius:16px;padding:13px 15px;font-size:15px;color:var(--dim);background:var(--surface)}
+.flow .fr > div:nth-child(3){background:var(--world);border-color:var(--world);color:var(--ink)}
+.flow .fr > span{display:grid;place-items:center;font-weight:700;font-size:20px}
+.flow .fh span{font:600 12.5px var(--f-body);letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+@media (max-width:760px){.flow .fh{display:none}.flow .fr{grid-template-columns:minmax(0,1fr)}.flow .fr > span{transform:rotate(90deg);height:26px}}
+
+/* Kanban */
+.kanban{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:16px}
+@media (max-width:980px){.kanban{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.kanban{grid-template-columns:minmax(0,1fr)}}
+.col{border-radius:20px;padding:12px;background:rgba(14,12,20,.05);display:grid;gap:10px;align-content:start}
+.col-h{display:flex;justify-content:space-between;font:800 17px var(--f-disp);padding:4px 4px 0}
+.col-h span{font-variant-numeric:tabular-nums;width:26px;height:26px;border-radius:50%;background:var(--ink);color:var(--cream);display:grid;place-items:center;font:700 13px var(--f-body)}
+.kc{border-radius:14px;padding:12px;background:var(--paper);display:grid;gap:7px;font-size:14px;border-top:5px solid var(--c);transition:transform .4s var(--ease)}
+.kc:hover{transform:translateY(-3px) rotate(-.6deg)}
+.kc .ax{font:600 12px var(--f-body);color:#5B5566}
+.kc .t b{font-weight:700;margin-right:6px}
+.kc .t{line-height:1.35}
+.kc .m{display:flex;justify-content:space-between;color:#5B5566;font-size:13px;font-variant-numeric:tabular-nums}
+.kc .dep{font-size:12px;color:#5B5566}
+.empty{font-size:14px;color:var(--dim);text-align:center;padding:18px;border:1.5px dashed var(--line);border-radius:14px}
+
+/* Onglets */
+.tabs{display:inline-flex;gap:4px;padding:5px;border-radius:999px;background:rgba(14,12,20,.06);flex-wrap:wrap}
+.tabs button{border:0;background:none;cursor:pointer;font:600 14px var(--f-body);color:var(--dim);padding:8px 16px;border-radius:999px;transition:background .3s,color .3s}
+.tabs button[aria-pressed="true"]{background:var(--ink);color:var(--cream)}
+
+/* Calendrier */
+.cal{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:760px){.cal{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.cal > div{border:1px solid var(--line);border-radius:18px;padding:14px;background:var(--surface);display:grid;gap:4px;align-content:start;justify-items:start}
+.cal b{font:800 22px var(--f-disp);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.cal span{font-size:14px;color:var(--dim)}
+.cal .last{background:var(--papaya);border-color:var(--papaya);--dim:rgba(14,12,20,.8)}
+.cal .last .tag{background:var(--ink);color:var(--cream)}
+.swatches{display:flex;gap:12px;flex-wrap:wrap}
+.swatches div{display:grid;gap:6px;font-size:13px;color:var(--dim);font-variant-numeric:tabular-nums}
+.swatches i{width:64px;height:64px;border-radius:50%;border:1px solid var(--line);display:block}
+
+/* Phases de lancement */
+.phases{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media (max-width:860px){.phases{grid-template-columns:minmax(0,1fr)}}
+.phases h4{margin:8px 0 12px;font-size:24px}
+.phases .j{background:var(--sun);border-color:var(--sun);--dim:rgba(14,12,20,.8)}
+.phases .j .tag.gold{background:var(--ink);color:var(--sun)}
+
+/* Quoi / Donc */
+.qde{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media (max-width:860px){.qde{grid-template-columns:minmax(0,1fr)}}
+.qde h4{font:800 30px var(--f-disp);margin-bottom:10px;letter-spacing:-.03em;display:flex;align-items:center;gap:10px}
+.qde h4::before{content:"";width:14px;height:14px;border-radius:50%;background:var(--world)}
+.qde p{color:var(--dim);font-size:15.5px}
+.formula{font:600 15px/1.6 var(--f-body);background:var(--paper);border:1.5px dashed var(--line);border-radius:16px;padding:14px 18px;overflow-x:auto}
+
+/* Parcours */
+.profile{display:grid;grid-template-columns:minmax(0,.7fr) minmax(0,1.3fr);gap:clamp(24px,4vw,64px);align-items:start}
+@media (max-width:860px){.profile{grid-template-columns:minmax(0,1fr)}}
+.portrait{position:relative;overflow:hidden;max-width:420px;border-radius:42% 58% 63% 37% / 41% 44% 56% 59%;animation:morph 12s ease-in-out infinite}
+.portrait img{width:100%;aspect-ratio:4/5;object-fit:cover;object-position:top}
+.portrait .badge{position:absolute;left:50%;bottom:9%;transform:translateX(-50%)}
+.facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:26px}
+.facts > div{background:var(--ink);color:var(--cream);padding:16px 18px;border-radius:18px}
+.facts .k{color:var(--world)}
+.facts b{display:block;font-weight:600;margin-top:4px;line-height:1.35}
+@media (max-width:520px){.facts{grid-template-columns:minmax(0,1fr)}}
+.skills{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+.dossier-h .skills .tag{background:var(--ink);color:var(--cream)}
+.exp{position:relative;display:grid;gap:20px;padding-left:38px}
+.exp::before{content:"";position:absolute;left:10px;top:12px;bottom:12px;width:2px;background:var(--world)}
+.job{position:relative}
+.job::before{content:"";position:absolute;left:-36px;top:28px;width:18px;height:18px;border-radius:50%;background:var(--cream);border:3px solid var(--world)}
+.job.now::before{background:var(--world)}
+.job .when{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.job h3{font-size:clamp(24px,2vw + 12px,36px);letter-spacing:-.03em;margin-bottom:4px}
+.job .org{color:var(--dim);margin-bottom:12px}
+.job ul{margin:0;padding-left:18px;color:var(--dim);display:grid;gap:6px;font-size:15.5px}
+.job .res{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:20px;border-top:1px solid var(--line);padding-top:18px}
+@media (max-width:620px){.job .res{grid-template-columns:minmax(0,1fr)}}
+.stat b{display:block;font:800 clamp(30px,2vw + 16px,44px)/1 var(--f-disp);letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.stat span{display:block;margin-top:6px;font-size:14px;color:var(--dim);line-height:1.4}
+.edu{display:grid}
+.edu > div{display:grid;grid-template-columns:120px minmax(0,1fr) auto;gap:16px;padding:14px 0;border-bottom:1px solid var(--line);align-items:baseline}
+.edu > div:last-child{border-bottom:0}
+.edu .y{font-weight:700;font-size:14px;font-variant-numeric:tabular-nums}
+.edu b{font-weight:600;display:block}
+.edu span{font-size:14px;color:var(--dim)}
+@media (max-width:560px){.edu > div{grid-template-columns:minmax(0,1fr)}}
+.tools{display:grid;gap:12px}
+.tool{display:grid;grid-template-columns:minmax(0,1fr) auto 64px;gap:12px;align-items:center;font-size:15px}
+.tool .lvl{display:flex;gap:5px}
+.tool .lvl i{width:12px;height:12px;border-radius:50%;background:rgba(14,12,20,.1)}
+.tool .lvl i.on{background:var(--world)}
+.tool .lv{font-size:13px;color:var(--dim);text-align:right}
+.langs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.langs div{border-radius:16px;padding:12px 14px;background:rgba(14,12,20,.05)}
+.langs b{display:block;font-weight:700}
+.langs span{font-size:13px;color:var(--dim)}
+.cv{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:560px){.cv{grid-template-columns:minmax(0,1fr)}}
+
+/* Contact */
+.contact-h{position:relative;overflow:hidden;background:var(--sun);color:var(--ink);padding-block:calc(var(--top) + 130px) clamp(56px,7vw,100px);--fg:var(--ink);--dim:rgba(14,12,20,.8);--line:rgba(14,12,20,.2)}
+.contact-h .top{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:32px;align-items:end}
+@media (max-width:820px){.contact-h .top{grid-template-columns:minmax(0,1fr)}}
+.contact-h h1{font-size:clamp(56px,10vw,170px);line-height:.86;letter-spacing:-.06em;margin:20px 0 0;max-width:12ch}
+.contact-h .blob{width:clamp(160px,20vw,280px);height:clamp(160px,20vw,280px);border-width:3px}
+.channels{display:grid;margin-top:clamp(40px,5vw,72px);border-top:1.5px solid rgba(14,12,20,.25)}
+.channel{position:relative;display:grid;grid-template-columns:150px minmax(0,1fr) auto;gap:18px;align-items:center;padding:22px 8px;border-bottom:1.5px solid rgba(14,12,20,.25);overflow:hidden}
+.channel::before{content:"";position:absolute;inset:0;background:var(--ink);transform:scaleY(0);transform-origin:50% 100%;transition:transform .6s var(--ease);z-index:0}
+.channel > *{position:relative;z-index:1;transition:color .4s}
+.channel:hover::before{transform:scaleY(1)}
+.channel:hover > *{color:var(--cream)}
+.channel .k{color:inherit}
+.channel .val{font:800 clamp(22px,2.6vw + 8px,44px)/1.1 var(--f-disp);letter-spacing:-.03em;overflow-wrap:anywhere;text-decoration:none;font-variant-numeric:tabular-nums}
+.copy{border:1.5px solid currentColor;background:transparent;border-radius:999px;padding:8px 14px;cursor:pointer;font:600 13px var(--f-body);color:inherit}
+@media (max-width:620px){.channel{grid-template-columns:minmax(0,1fr) auto}.channel .k{grid-column:1/-1}}
+
+/* Pied */
+footer{background:var(--ink);color:var(--cream);padding-block:56px 32px;position:relative;z-index:2}
+footer .wrap{display:grid;gap:36px}
+footer .fbig{font:800 clamp(48px,8vw,140px)/.9 var(--f-disp);letter-spacing:-.06em}
+footer .frow{display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px 32px;font-size:15px;color:var(--dim)}
+footer .frow a{text-decoration:none}
+footer .frow a:hover{color:var(--cream)}
+
+/* Navigation rapide */
+#pal{border:0;border-radius:24px;background:var(--ink);color:var(--cream);padding:0;width:min(620px,calc(100% - 32px));max-height:min(70vh,560px);margin:12vh auto auto}
+#pal::backdrop{background:rgba(14,12,20,.6);backdrop-filter:blur(6px)}
+#pal .in{display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--line);padding:16px 20px}
+#pal .in i{width:12px;height:12px;border-radius:50%;background:var(--world);flex:none}
+#pal input{flex:1;min-width:0;background:none;border:0;outline:0;font:500 17px var(--f-body);color:var(--cream)}
+#pal input::placeholder{color:rgba(244,239,231,.6)}
+#pal ul{list-style:none;margin:0;padding:8px;overflow:auto;max-height:calc(min(70vh,560px) - 64px)}
+#pal li{display:flex;justify-content:space-between;gap:12px;padding:11px 14px;border-radius:14px;cursor:pointer;font-size:15.5px}
+#pal li small{font-size:13px;color:var(--dim);white-space:nowrap}
+#pal li[aria-selected="true"]{background:var(--world);color:var(--ink)}
+#pal li[aria-selected="true"] small{color:rgba(14,12,20,.75)}
+#pal .none{color:var(--dim);padding:16px}
+
+/* Visionneuse */
+#lb{border:0;padding:0;background:transparent;max-width:min(1200px,calc(100% - 24px));max-height:calc(100% - 24px);color:var(--cream)}
+#lb::backdrop{background:rgba(14,12,20,.9)}
+#lb .box{display:grid;gap:10px}
+#lb img{max-height:calc(100vh - 110px);width:auto;margin:0 auto;border-radius:16px;background:#fff}
+#lb .lbb{display:flex;justify-content:space-between;gap:12px;align-items:center}
+#lb p{font-size:14px;color:rgba(244,239,231,.84)}
+#lb .copy{color:var(--cream)}
+
+.morph [data-bg]{background-color:transparent!important}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}html{scroll-behavior:auto}.ltr{transform:none}}
+</style>
+</head>
+<body>
+
+
+<div id="cursor" aria-hidden="true"><span></span></div>
+<div id="wipe" aria-hidden="true"><span id="wipe-t"></span></div>
+<div class="progress" id="progress" aria-hidden="true"></div>
+
+<header class="hud">
+  <div class="wrap">
+    <a class="logo" href="#accueil" data-cursor="Accueil"><i aria-hidden="true"></i>Isidore Laly</a>
+    <nav class="nav" aria-label="Navigation principale">
+      <a href="#accueil" data-r="accueil">Accueil</a>
+      <a href="#formation" data-r="formation">Formation</a>
+      <a href="#nettivert" data-r="nettivert">Nettivert</a>
+      <a href="#parcours" data-r="parcours">Parcours</a>
+      <a href="#contact" data-r="contact">Contact</a>
+    </nav>
+    <span class="clock">Cotonou <b id="clk">--:--</b></span>
+    <button class="search-btn" type="button" id="open-pal">Chercher <kbd>Ctrl K</kbd></button>
+    <button class="menu-btn" type="button" id="menu-btn" aria-expanded="false" aria-controls="menu">Menu</button>
+  </div>
+</header>
+
+<div id="menu" aria-hidden="true">
+  <nav aria-label="Menu">
+    <a href="#accueil" data-r="accueil"><small>01</small>Accueil</a>
+    <a href="#formation" data-r="formation"><small>02</small>Formation</a>
+    <a href="#nettivert" data-r="nettivert"><small>03</small>Nettivert</a>
+    <a href="#parcours" data-r="parcours"><small>04</small>Parcours</a>
+    <a href="#contact" data-r="contact"><small>05</small>Contact</a>
+  </nav>
+  <div class="menu-foot"><span>isidorelaly@gmail.com</span><span>+229 01 97 97 87 71</span><span>Cotonou, Bénin</span></div>
+</div>
+
+<main>
+
+<!-- ================= ACCUEIL ================= -->
+<div data-view="accueil" id="v-accueil">
+  <section class="hero">
+    <canvas id="fluid" aria-hidden="true"></canvas>
+    <div class="wrap hero-in on-color">
+      <p class="hero-top"><span>Portfolio 2026</span><span>Chef de projet marketing digital 360°</span><span>Cotonou, Bénin</span></p>
+      <h1 class="giant" aria-label="Isidore Laly">
+        <span class="line"><span class="ch">Isidore</span></span>
+        <span class="line l2"><span class="blob"><img src="img/photo-portrait.webp" alt="" width="600" height="690"></span><span class="ch" data-i0="7">Laly</span></span>
+      </h1>
+      <div class="hero-bottom">
+        <p class="lede">Je pilote vos projets digitaux de l'audit au tableau de bord : un constat chiffré, un plan daté et budgété, un lancement cohérent, puis des indicateurs qui disent si ça marche.</p>
+        <div class="cta">
+          <a class="btn prime" href="#nettivert" data-cursor="Ouvrir">Voir l'étude Nettivert <span class="arr">→</span></a>
+          <a class="btn" href="#formation" data-cursor="Ouvrir">Les 11 livrables <span class="arr">→</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="marquee" data-marquee data-dir="1" data-mspeed=".7" data-skew aria-hidden="true">
+    <div class="mq-track"><span>Cadrer<i style="--c:var(--papaya)"></i><em>Positionner</em><i style="--c:var(--lilac)"></i>Diagnostiquer<i style="--c:var(--lagoon)"></i><em>Planifier</em><i style="--c:var(--sun)"></i>Lancer<i style="--c:var(--rose)"></i><em>Piloter</em><i style="--c:var(--papaya)"></i></span></div>
+  </div>
+
+  <section class="stats" data-bg="#0E0C14">
+    <div class="wrap grid">
+      <div class="stat-big rv" style="--c:var(--papaya)"><b data-count="18">18</b><span>livrables présentés dans ce portfolio</span></div>
+      <div class="stat-big rv" style="--c:var(--lilac)"><b data-count="12.5" data-dec="1" data-suf=" M">12,5 M</b><span>FCFA de budget annuel planifié et suivi</span></div>
+      <div class="stat-big rv" style="--c:var(--lagoon)"><b data-count="75">75</b><span>agents coordonnés sur le terrain</span></div>
+      <div class="stat-big rv" style="--c:var(--sun)"><b data-count="45" data-pre="33→" data-suf=" %">33→45 %</b><span>de part de marché gagnés en un an</span></div>
+    </div>
+  </section>
+
+  <section class="hs" id="methode" data-bg="#0E0C14">
+    <div class="hs-pin">
+      <div class="wrap hs-head">
+        <div style="display:grid;gap:14px"><span class="eyebrow">La méthode</span><h2 class="split-words">Six phases, chaque livrable s'appuie sur le précédent</h2></div>
+        <p>Le cahier des charges fixe les cibles, l'audit explique l'écart, le plan organise la correction, le lancement teste les canaux et le tableau de bord vérifie le résultat.</p>
+      </div>
+      <div class="hs-track">
+        <button class="phase" type="button" style="--c:var(--papaya)" data-go="formation" data-sub="f-cadrer" data-cursor="Lire"><span class="num">01</span><span><small>Cahier des charges</small><h3>Cadrer</h3><p>Cibles, budget, délais et critères de recette, écrits pour que le développeur construise le bon site.</p></span></button>
+        <button class="phase" type="button" style="--c:var(--lilac)" data-go="formation" data-sub="f-marque" data-cursor="Lire"><span class="num">02</span><span><small>Plateforme de marque</small><h3>Positionner</h3><p>Une promesse fondée sur les bénéfices clients, que le client peut vérifier.</p></span></button>
+        <button class="phase" type="button" style="--c:var(--lagoon)" data-go="formation" data-sub="f-audit" data-cursor="Lire"><span class="num">03</span><span><small>Audit 360°</small><h3>Diagnostiquer</h3><p>Croiser chiffres, CRM et terrain pour trouver où l'argent se perd.</p></span></button>
+        <button class="phase" type="button" style="--c:var(--sun)" data-go="formation" data-sub="f-plan" data-cursor="Lire"><span class="num">04</span><span><small>QQOQCCP et Gantt</small><h3>Planifier</h3><p>Des tâches datées, chiffrées, avec un responsable et des marges de sécurité.</p></span></button>
+        <button class="phase" type="button" style="--c:var(--rose)" data-go="formation" data-sub="f-lancer" data-cursor="Lire"><span class="num">05</span><span><small>Lancement 360°</small><h3>Lancer</h3><p>Un même message sur tous les canaux, du flyer à la démonstration, chacun mesuré.</p></span></button>
+        <button class="phase" type="button" style="--c:var(--cream)" data-go="formation" data-sub="f-piloter" data-cursor="Lire"><span class="num">06</span><span><small>Tableau de bord</small><h3>Piloter</h3><p>Des indicateurs reliés à une décision, et un rapport mensuel pour le dirigeant.</p></span></button>
+        <div class="phase end"><p>Un indicateur n'a de valeur que s'il mène à une décision.</p></div>
+      </div>
+      <div class="wrap"><div class="hs-progress"><i></i></div></div>
+    </div>
+  </section>
+
+  <section class="projects light" data-bg="#F4EFE7">
+    <div class="wrap">
+      <div class="sec-h"><span class="eyebrow">Deux projets</span><h2 class="split-words">Apprendre la méthode, puis l'appliquer</h2><p>La formation m'a fait pratiquer chaque outil du chef de projet sur des cas imposés. La spécialisation m'a demandé de les enchaîner sur une seule entreprise, sans perdre le fil entre l'audit et le tableau de bord.</p></div>
+      <div class="stackcards">
+        <a class="pcard" href="#nettivert" style="--pc:var(--lagoon)" data-cursor="Ouvrir">
+          <div class="txt">
+            <div class="row"><span class="tag">Projet de spécialisation</span><span class="tag">Novembre 2026</span></div>
+            <h3>Nettivert : rendre visible une écologie prouvée</h3>
+            <p>Une agence de nettoyage écologique B2B perd clients et devis. Audit, plateforme de marque, plan QQOQCCP, brief créatif, Kanban, lancement phygital et tableau de bord à cinq indicateurs.</p>
+            <div class="minis"><div><b>12</b><span>tâches en 8 semaines</span></div><div><b>7,15 M</b><span>FCFA de budget</span></div><div><b>5</b><span>indicateurs et ROI dynamique</span></div></div>
+            <span class="go"><i>↗</i>Ouvrir le projet</span>
+          </div>
+          <div class="pimg"><img src="img/tdb-kpi.webp" alt="Tableau de bord Nettivert" loading="lazy" width="1164" height="660" data-speed=".08"></div>
+        </a>
+        <a class="pcard" href="#formation" style="--pc:var(--papaya)" data-cursor="Ouvrir">
+          <div class="txt">
+            <div class="row"><span class="tag">Parcours de formation</span><span class="tag">Sept.–nov. 2026</span></div>
+            <h3>Maison d'outillage et rénovation : onze livrables</h3>
+            <p>Cahier des charges e-commerce, plateforme de marque, audit 360°, plan annuel et budget, lancement produit, Trello, tableau de bord à trois boutiques et rapport d'activité.</p>
+            <div class="minis"><div><b>75</b><span>micro-tâches planifiées sur 2027</span></div><div><b>12,5 M</b><span>FCFA de budget annuel</span></div><div><b>23</b><span>indicateurs retenus, 4 écartés</span></div></div>
+            <span class="go"><i>↗</i>Ouvrir le projet</span>
+          </div>
+          <div class="pimg"><img src="img/f-tdb1.webp" alt="Tableau de bord Maison d'outillage" loading="lazy" width="1621" height="715" data-speed=".08"></div>
+        </a>
+        <a class="pcard" href="#parcours" style="--pc:var(--lilac)" data-cursor="Ouvrir">
+          <div class="txt">
+            <div class="row"><span class="tag">Parcours</span><span class="tag">2020 – aujourd'hui</span></div>
+            <h3>Du porte-à-porte au pilotage d'une zone</h3>
+            <p>Agent commercial, superviseur, puis Responsable Acquisition : six ans à piloter des équipes terrain et des chiffres réels, avant le marketing digital.</p>
+            <div class="minis"><div><b>+30 %</b><span>de New Add en un an</span></div><div><b>45 → 75</b><span>agents dans l'effectif</span></div><div><b>3</b><span>communes pilotées</span></div></div>
+            <span class="go"><i>↗</i>Voir mon parcours</span>
+          </div>
+          <div class="pimg"><img src="img/photo-profil.webp" alt="Isidore Laly" loading="lazy" width="900" height="1184" data-speed=".08" style="object-position:50% 15%"></div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="docs" data-bg="#0E0C14">
+    <div class="wrap"><div class="sec-h" style="margin:0"><span class="eyebrow">Les livrables</span><h2 class="split-words">Les documents, tels que je les ai remis</h2><p>Survolez pour ralentir, cliquez pour agrandir.</p></div></div>
+    <div class="drow" data-marquee data-dir="1" data-mspeed=".5">
+      <div class="mq-track">
+        <button class="dthumb" type="button" data-zoom="img/audit.webp" data-cap="Nettivert : rapport d'audit"><img src="img/audit.webp" alt="Rapport d'audit Nettivert" loading="lazy" width="497" height="702"></button>
+        <button class="dthumb" type="button" data-zoom="img/f-cahier.webp" data-cap="Formation : cahier des charges"><img src="img/f-cahier.webp" alt="Cahier des charges" loading="lazy" width="827" height="1170"></button>
+        <button class="dthumb" type="button" data-zoom="img/brief.webp" data-cap="Nettivert : brief créatif"><img src="img/brief.webp" alt="Brief créatif" loading="lazy" width="497" height="702"></button>
+        <button class="dthumb" type="button" data-zoom="img/f-plateforme.webp" data-cap="Formation : plateforme de marque"><img src="img/f-plateforme.webp" alt="Plateforme de marque" loading="lazy" width="827" height="1170"></button>
+        <button class="dthumb" type="button" data-zoom="img/lancement.webp" data-cap="Nettivert : plan de lancement"><img src="img/lancement.webp" alt="Plan de lancement Nettivert" loading="lazy" width="497" height="702"></button>
+        <button class="dthumb" type="button" data-zoom="img/f-audit.webp" data-cap="Formation : rapport d'audit"><img src="img/f-audit.webp" alt="Rapport d'audit" loading="lazy" width="827" height="1170"></button>
+        <button class="dthumb" type="button" data-zoom="img/f-retro.webp" data-cap="Formation : rétro-planning"><img src="img/f-retro.webp" alt="Rétro-planning" loading="lazy" width="827" height="1170"></button>
+        <button class="dthumb" type="button" data-zoom="img/f-lancement.webp" data-cap="Formation : plan de lancement 360°"><img src="img/f-lancement.webp" alt="Plan de lancement 360°" loading="lazy" width="827" height="1170"></button>
+      </div>
+    </div>
+    <div class="drow" data-marquee data-dir="-1" data-mspeed=".5">
+      <div class="mq-track">
+        <button class="dthumb" type="button" data-zoom="img/slide-2.webp" data-cap="Nettivert : synthèse du tableau de bord"><img src="img/slide-2.webp" alt="Diapositive de synthèse Nettivert" loading="lazy" width="1300" height="732"></button>
+        <button class="dthumb" type="button" data-zoom="img/f-tdb2.webp" data-cap="Formation : analyses par boutique et par source"><img src="img/f-tdb2.webp" alt="Tableau de bord formation" loading="lazy" width="1620" height="930"></button>
+        <button class="dthumb" type="button" data-zoom="img/plan.webp" data-cap="Nettivert : plan d'action"><img src="img/plan.webp" alt="Plan d'action Nettivert" loading="lazy" width="702" height="497"></button>
+        <button class="dthumb" type="button" data-zoom="img/f-slide-3.webp" data-cap="Formation : rapport d'activité d'octobre"><img src="img/f-slide-3.webp" alt="Rapport d'activité" loading="lazy" width="1467" height="825"></button>
+        <button class="dthumb" type="button" data-zoom="img/budget.webp" data-cap="Nettivert : suivi budgétaire"><img src="img/budget.webp" alt="Suivi budgétaire" loading="lazy" width="1592" height="653"></button>
+        <button class="dthumb" type="button" data-zoom="img/f-trello.webp" data-cap="Formation : suivi d'équipe dans Trello"><img src="img/f-trello.webp" alt="Trello" loading="lazy" width="1442" height="822"></button>
+        <button class="dthumb" type="button" data-zoom="img/slide-4.webp" data-cap="Nettivert : Donc, le frein est commercial"><img src="img/slide-4.webp" alt="Diapositive Donc" loading="lazy" width="1300" height="732"></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="terrain on-color" data-bg="#FFCF3A">
+    <div class="wrap">
+      <div style="display:grid;gap:18px">
+        <span class="eyebrow">Le terrain avant le marketing</span>
+        <h2 class="split-words">Six ans à piloter des équipes et des chiffres réels</h2>
+        <p class="prose" style="font-size:18px">Agent commercial, puis superviseur, puis Responsable Acquisition : je coordonne aujourd'hui 75 agents sur trois communes. C'est sur le terrain que j'ai appris qu'un plan ne vaut que par son suivi.</p>
+        <div class="cta"><a class="btn prime" href="#parcours" data-cursor="Ouvrir">Voir mon parcours <span class="arr">→</span></a></div>
+      </div>
+      <div class="bigs">
+        <div class="rv"><b data-count="30" data-pre="+" data-suf=" %">+30 %</b><span>de New Add en un an</span></div>
+        <div class="rv"><b data-count="45" data-pre="33→" data-suf=" %">33→45 %</b><span>de part de marché</span></div>
+        <div class="rv"><b data-count="75" data-pre="45→">45→75</b><span>agents dans l'effectif</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ctabig on-color" data-bg="#FF5B2E">
+    <div class="wrap">
+      <span class="eyebrow">Un projet à piloter ?</span>
+      <a href="#contact" data-cursor="Écrire" style="margin-top:22px">Parlons de votre prochain projet <span>↗</span></a>
+      <p>Une question sur Nettivert, sur mon parcours ou une proposition : écrivez-moi, je réponds rapidement.</p>
+    </div>
+  </section>
+</div>
+
+<!-- ================= FORMATION ================= -->
+<div data-view="formation" id="v-formation" hidden>
+  <section class="dossier-h">
+    <div class="wrap">
+      <span class="eyebrow">Parcours de formation · D-CLIC, OIF · Sept.–nov. 2026</span>
+      <h1>Onze livrables pour piloter un projet <em class="hl">de bout en bout</em></h1>
+      <p class="prose">La formation Gestion de projet marketing digital 360° m'a fait passer par toutes les étapes : cadrer un site e-commerce, poser une marque, diagnostiquer une entreprise en perte de vitesse, planifier et budgéter une année, lancer un produit, suivre le travail en équipe, puis piloter avec un tableau de bord et un rapport mensuel.</p>
+      <p class="note" style="margin-top:18px">Les cas sont ceux de la formation : Maison d'outillage, enseigne de bricolage à trois boutiques, et une entreprise de rénovation de bâtiments.</p>
+    </div>
+  </section>
+  <div class="chips" data-chips>
+    <div class="wrap">
+      <button type="button" data-to="f-cadrer"><i>1</i>Cadrer</button>
+      <button type="button" data-to="f-marque"><i>2</i>Positionner</button>
+      <button type="button" data-to="f-audit"><i>3</i>Diagnostiquer</button>
+      <button type="button" data-to="f-plan"><i>4</i>Planifier</button>
+      <button type="button" data-to="f-lancer"><i>5</i>Lancer</button>
+      <button type="button" data-to="f-piloter"><i>6</i>Piloter</button>
+      <button type="button" data-to="f-bilan"><i>✓</i>Bilan</button>
+    </div>
+  </div>
+
+  <div class="light">
+  <section class="chapter" id="f-cadrer" style="border-top:0">
+    <div class="wrap">
+      <div class="ch-h"><div class="idx"><span class="hexnum">1</span><span class="eyebrow">Cadrer</span></div><h2>Le cahier des charges du site e-commerce</h2><p>Maison d'outillage vend en boutique et doit vendre en ligne. Mon rôle : écrire le document qui permet à un développeur de construire le bon site, au bon prix, dans le bon délai.</p></div>
+      <div class="grid g4" style="margin-bottom:28px">
+        <div class="panel metric"><span class="v">3,5 M FCFA</span><span class="l">de budget maximal</span></div>
+        <div class="panel metric"><span class="v">12 semaines</span><span class="l">de réalisation</span></div>
+        <div class="panel metric"><span class="v">3 clics</span><span class="l">au plus pour acheter depuis une fiche produit</span></div>
+        <div class="panel metric"><span class="v">90 / 100</span><span class="l">de score mobile minimal à la recette</span></div>
+      </div>
+      <div class="split">
+        <ul class="list">
+          <li><span><b>Une cible précise.</b> Le persona « jeune propriétaire connecté », 30 à 35 ans, achète depuis son téléphone, veut gagner du temps et être rassuré par les avis. D'où une interface mobile first et des preuves sociales sur chaque fiche.</span></li>
+          <li><span><b>Des choix argumentés.</b> WordPress et WooCommerce plutôt que Shopify (abonnement, dépendance), PrestaShop ou Magento (trop lourds pour 30 produits). Paiement MTN MoMo, Moov Money, Celtiis Cash, carte et à la livraison via un agrégateur béninois.</span></li>
+          <li><span><b>Des objectifs mesurables.</b> Conversion de 1,5 à 2 %, NPS supérieur à 40, rebond sous 55 %, trafic organique en hausse de 10 % par mois dès le troisième mois.</span></li>
+          <li><span><b>Le cadre légal béninois.</b> Code du numérique (loi n° 2017-20), formalités APDP avant toute collecte, pages légales relues par un juriste.</span></li>
+        </ul>
+        <button class="figure" type="button" data-zoom="img/f-cahier.webp" data-cap="Cahier des charges, 5 pages"><span class="frame"><img src="img/f-cahier.webp" alt="Cahier des charges" loading="lazy" width="827" height="1170"></span><span class="cap">Cahier des charges, 5 pages</span></button>
+      </div>
+      <h3 class="sub">Préparer la réunion de cadrage</h3>
+      <div class="split">
+        <div class="grid" style="gap:16px">
+          <p class="prose">Une réunion de deux heures en neuf points minutés, de l'accueil des parties prenantes au tour de table final, avec des règles de gestion du temps : chronométreur, sujets longs traités hors séance.</p>
+          <p class="prose">Le compte rendu suit le modèle <b>RIDA</b> : résumé de chaque point, tour de table, puis un tableau d'actions avec responsable, échéance et statut. Ce format sert ensuite à la revue mensuelle des indicateurs.</p>
+        </div>
+        <button class="figure" type="button" data-zoom="img/f-modele.webp" data-cap="Modèles ODJ et RIDA, 2 pages"><span class="frame"><img src="img/f-modele.webp" alt="Modèles ODJ et RIDA" loading="lazy" width="827" height="1170" style="aspect-ratio:4/3;object-fit:cover;object-position:top"></span><span class="cap">Modèles ODJ et RIDA, 2 pages</span></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter" id="f-marque">
+    <div class="wrap">
+      <div class="ch-h"><div class="idx"><span class="hexnum">2</span><span class="eyebrow">Positionner</span></div><h2>La plateforme de marque d'un rénovateur</h2><p>J'ai commencé par observer la concurrence avant d'écrire quoi que ce soit.</p></div>
+      <div class="grid g2" style="margin-bottom:24px">
+        <div class="panel axis"><span class="k">Concurrent 1</span><h4>Un échec d'alignement</h4><p>Un slogan descriptif et des réseaux sociaux au ton TikTok, en contradiction avec des valeurs de tradition affichées depuis 1980.</p></div>
+        <div class="panel axis"><span class="k">Concurrent 2</span><h4>Le low cost</h4><p>Des prestations à très bas prix. La place libre est celle de l'expertise et de la transparence.</p></div>
+      </div>
+      <div class="split">
+        <div class="panel" style="display:grid;gap:20px">
+          <div><span class="k">Proposition de valeur unique</span><p class="uvp" style="margin-top:8px">Une expertise de rénovation premium qui sécurise votre projet, de la conception à la réalisation, avec exigence, transparence et durabilité.</p></div>
+          <dl class="dl">
+            <div><dt>Vision</dt><dd>Devenir la référence locale de la rénovation premium, reconnue pour son expertise et la sérénité qu'elle apporte aux propriétaires.</dd></div>
+            <div><dt>Valeurs</dt><dd><b>Excellence, exigence, transparence</b> : aucun faux frais, aucun débit caché.</dd></div>
+            <div><dt>Ton</dt><dd>Rassurant, expert et premium : expert sans être condescendant, premium sans être prétentieux.</dd></div>
+            <div><dt>Cercle d'or</dt><dd>Pourquoi : chaque propriétaire mérite un habitat à la hauteur de ses exigences. Comment : expertise, matériaux certifiés, transparence. Quoi : des rénovations premium.</dd></div>
+          </dl>
+          <p class="prose"><b>Ma recommandation :</b> fonder la proposition de valeur sur les bénéfices clients, rédiger un guide de langage commun aux équipes réseaux sociaux et intervention, et assumer une posture experte pour récupérer les clients déçus.</p>
+        </div>
+        <button class="figure" type="button" data-zoom="img/f-plateforme.webp" data-cap="Plateforme de marque, 2 pages"><span class="frame"><img src="img/f-plateforme.webp" alt="Plateforme de marque" loading="lazy" width="827" height="1170"></span><span class="cap">Plateforme de marque, 2 pages</span></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter" id="f-audit">
+    <div class="wrap">
+      <div class="ch-h"><div class="idx"><span class="hexnum">3</span><span class="eyebrow">Diagnostiquer</span></div><h2>Pourquoi le chiffre d'affaires baisse</h2><p>Le chiffre d'affaires recule alors que le budget publicitaire a doublé. J'ai croisé les chiffres, le CRM, le terrain et le retour des commerciaux pour trouver où l'argent se perd.</p></div>
+      <div class="grid g4" style="margin-bottom:24px">
+        <div class="panel metric"><span class="l">Taux de rebond</span><span class="v">40 %<span class="arrow">→</span>75 %</span><span class="tag bad">Dégradé</span></div>
+        <div class="panel metric"><span class="l">Taux de conversion</span><span class="v">4 %<span class="arrow">→</span>0,8 %</span><span class="tag bad">Dégradé</span></div>
+        <div class="panel metric"><span class="l">Rappel d'un prospect</span><span class="v">5 jours</span><span class="tag bad">Trop lent</span></div>
+        <div class="panel metric"><span class="l">Chiffre d'affaires, panier moyen</span><span class="v">−15 %, −20 %</span><span class="tag bad">En baisse</span></div>
+      </div>
+      <div class="grid g3" style="margin-bottom:24px">
+        <div class="panel axis"><span class="k">Axe 1 · Expérience digitale</span><p>Le site met 8 secondes à charger. Le référencement apporte 150 % de trafic en plus, sans un devis de plus : le formulaire est trop long et illisible sur mobile.</p><p class="fix">Refondre le site, avec un formulaire rempli en moins d'une minute sur mobile.</p></div>
+        <div class="panel axis"><span class="k">Axe 2 · Acquisition</span><p>Les posts Instagram de chantiers terminés apportent plus de 80 % des devis ; 325 000 FCFA de flyers n'en ont apporté aucun. La moitié des demandes vient de plus de 100 km.</p><p class="fix">Cibler un rayon de 50 km, affirmer le premium pour filtrer les chasseurs de prix.</p></div>
+        <div class="panel axis"><span class="k">Axe 3 · Fidélisation</span><p>60 % de la base CRM est inactive, 20 % des clients font 80 % du chiffre d'affaires, et seuls 5 % reviennent.</p><p class="fix">CRM avec alerte sous 24 heures, réactivation et Club Privilège.</p></div>
+      </div>
+      <div class="split">
+        <div class="grid" style="gap:18px">
+          <div class="signal"><small>L'analyse qui change tout</small><b>Le bon indicateur n'est pas le clic, c'est le coût d'un client réel.</b><span>Des clics pas chers ne valent rien quand ils attirent des gens hors zone ou en quête de low cost : ils font exploser le coût par acquisition.</span></div>
+          <div class="ssc">
+            <div class="stop"><span class="tag bad">Arrêter</span><ul><li>Les flyers</li><li>Doubler Facebook Ads sans corriger le ciblage</li><li>Attendre 5 jours avant de rappeler</li></ul></div>
+            <div class="cont"><span class="tag brand">Continuer</span><ul><li>Les posts Instagram de chantiers</li><li>Le travail de référencement</li></ul></div>
+            <div class="go"><span class="tag ok">Démarrer</span><ul><li>Refonte et formulaire court</li><li>Ciblage à 50 km</li><li>Avis après chaque chantier</li><li>CRM avec alerte 24 h</li><li>Club Privilège</li></ul></div>
+          </div>
+        </div>
+        <button class="figure" type="button" data-zoom="img/f-audit.webp" data-cap="Rapport d'audit, 4 pages"><span class="frame"><img src="img/f-audit.webp" alt="Rapport d'audit" loading="lazy" width="827" height="1170"></span><span class="cap">Rapport d'audit, 4 pages</span></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter" id="f-plan">
+    <div class="wrap">
+      <div class="ch-h"><div class="idx"><span class="hexnum">4</span><span class="eyebrow">Planifier</span></div><h2>Une année d'actions, chiffrée et budgétée</h2><p>Les recommandations de l'audit deviennent cinq actions pour 2027, décrites en QQOQCCP et découpées en micro-tâches avec livrable, responsable et dates.</p></div>
+      <div class="tbl"><table>
+        <thead><tr><th>N°</th><th>Action</th><th>Ce qu'elle corrige</th><th class="n">Micro-tâches</th><th class="n">Coût (FCFA)</th></tr></thead>
+        <tbody>
+          <tr><td><b>A1</b></td><td><b>Site web et parcours de conversion</b></td><td>Site lent, formulaire illisible sur mobile</td><td class="n">13</td><td class="n">2 185 000</td></tr>
+          <tr><td><b>A2</b></td><td><b>Acquisition et positionnement premium</b></td><td>Prospects hors zone, chasseurs de prix</td><td class="n">14</td><td class="n">7 580 000</td></tr>
+          <tr><td><b>A3</b></td><td><b>CRM et suivi commercial</b></td><td>Rappel des prospects en 5 jours</td><td class="n">15</td><td class="n">1 220 000</td></tr>
+          <tr><td><b>A4</b></td><td><b>Fidélisation et valeur client</b></td><td>Aucun avis collecté, 5 % de clients qui reviennent</td><td class="n">15</td><td class="n">300 000</td></tr>
+          <tr><td><b>A5</b></td><td><b>Réactivation de la base</b></td><td>60 % de la base CRM inactive</td><td class="n">18</td><td class="n">400 000</td></tr>
+        </tbody>
+      </table></div>
+      <h3 class="sub">Le Gantt de l'année 2027</h3>
+      <div class="gantt"><div class="g-in" id="gantt-f"></div></div>
+      <h3 class="sub">Le suivi budgétaire annuel</h3>
+      <div class="panel">
+        <div class="stack" role="img" aria-label="Répartition du budget : média 52,6 %, honoraires 28,8 %, outils 18,5 %">
+          <div class="c-pet" style="flex:6000">Média 52,6 %</div>
+          <div class="c-or" style="flex:3290">Honoraires 28,8 %</div>
+          <div class="c-nuit" style="flex:2115">Outils 18,5 %</div>
+        </div>
+        <div class="bleg">
+          <div><i class="c-pet"></i>Média Meta et Google<b>6 000 000 FCFA</b></div>
+          <div><i class="c-or"></i>Honoraires (6 prestataires)<b>3 290 000 FCFA</b></div>
+          <div><i class="c-nuit"></i>Outils et production<b>2 115 000 FCFA</b></div>
+          <div class="total"><i class="c-ard"></i>Total avec marge de 10 %<b>12 545 500 FCFA</b></div>
+        </div>
+        <p class="prose" style="margin-top:16px;font-size:15px">Budget de base : 11 405 000 FCFA. Chaque honoraire est calculé au jour (par exemple 50 000 FCFA par jour pour le développeur pendant 21 jours), chaque abonnement à l'année, et le fichier compare prévisionnel et réalisé ligne par ligne.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter" id="f-lancer">
+    <div class="wrap">
+      <div class="ch-h"><div class="idx"><span class="hexnum">5</span><span class="eyebrow">Lancer</span></div><h2>Une tondeuse en magasin, du flyer à la démonstration</h2><p>Lancement d'une tondeuse HOBBY TOOLS à Cotonou : l'affiche attire l'attention, le QR code mène à une démonstration en ligne, puis le client vient l'essayer en magasin.</p></div>
+      <div class="signal" style="margin-bottom:24px"><small>Signature commune à tous les supports</small><b>« La puissance à l'état brut »</b><span>Même logo, même photo, mêmes couleurs sur l'affiche, Facebook, la page web, la vidéo et en magasin.</span></div>
+      <h3 class="sub">Huit canaux reliés, chacun mesuré</h3>
+      <div class="chan">
+        <div><b>Affiche et flyer</b><span>QR code vers le tutoriel et la page campagne</span></div>
+        <div><b>Démonstration en magasin</b><span>Le Jour J, à la même heure que la mise en ligne</span></div>
+        <div><b>Facebook</b><span>Teaser, compte à rebours, boost local de J-7 à J-1</span></div>
+        <div><b>WhatsApp</b><span>Questions de prix, de stock et d'adresse</span></div>
+        <div><b>Site et YouTube</b><span>Caractéristiques et tutoriel vidéo</span></div>
+        <div><b>Presse</b><span>Communiqué et kit presse au Matinal</span></div>
+        <div><b>Créateur de contenu</b><span>Démonstration par un créateur agricole</span></div>
+        <div><b>Partenaire et radio</b><span>Une jardinerie en relais, Radio Tokpa pour 85 000 FCFA</span></div>
+      </div>
+      <div class="signal" style="margin-top:16px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:22px;align-items:center">
+        <p class="big">38 %</p>
+        <p><span class="lead">Des canaux choisis sur des données.</span> L'enquête ISOC Bénin 2024 cite Facebook par 38 % des répondants, contre 20 % pour TikTok, et WhatsApp à 47 % parmi les messageries. Facebook annonce, WhatsApp convertit, TikTok relaie la vidéo.</p>
+      </div>
+      <h3 class="sub">Le rétro-planning, de J-30 à J+14</h3>
+      <div class="timeline">
+        <div><em>J-30</em><b>Préparer</b><p>Adresse, date, modèle, prix, stock, budget ; premiers contacts presse.</p></div>
+        <div><em>J-21</em><b>Produire</b><p>Visuels, flyers, page campagne, QR codes, vidéo, kit presse.</p></div>
+        <div><em>J-15</em><b>Teaser</b><p>Kit presse envoyé, premier teaser Facebook, page en ligne.</p></div>
+        <div><em>J-7</em><b>Relancer</b><p>Compte à rebours, boost, spots radio, relais confirmés.</p></div>
+        <div class="j"><em>Jour J</em><b>Lancer</b><p>Page en ligne au début de la démonstration ; presse et créateur sur place.</p></div>
+        <div><em>J+14</em><b>Bilan</b><p>Scans, visites, essais, ventes et retombées comparés par canal.</p></div>
+      </div>
+      <div class="grid g3" style="margin-top:30px">
+        <button class="figure" type="button" data-zoom="img/f-lancement.webp" data-cap="Plan de lancement 360°, 3 pages"><span class="frame"><img src="img/f-lancement.webp" alt="Plan de lancement 360°" loading="lazy" width="827" height="1170" style="aspect-ratio:4/3;object-fit:cover;object-position:top"></span><span class="cap">Plan de lancement 360°, 3 pages</span></button>
+        <button class="figure" type="button" data-zoom="img/f-retro.webp" data-cap="Rétro-planning, 2 pages"><span class="frame"><img src="img/f-retro.webp" alt="Rétro-planning" loading="lazy" width="827" height="1170" style="aspect-ratio:4/3;object-fit:cover;object-position:top"></span><span class="cap">Rétro-planning, 2 pages</span></button>
+        <button class="figure" type="button" data-zoom="img/f-trello.webp" data-cap="Suivi d'équipe dans Trello"><span class="frame"><img src="img/f-trello.webp" alt="Tableau Trello" loading="lazy" width="1442" height="822" style="aspect-ratio:4/3;object-fit:cover;object-position:left top"></span><span class="cap">Trello : une carte par tâche, une colonne Validation</span></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter" id="f-piloter">
+    <div class="wrap">
+      <div class="ch-h"><div class="idx"><span class="hexnum">6</span><span class="eyebrow">Piloter</span></div><h2>Piloter et rendre compte</h2><p>Le tableau de bord suit trois boutiques (Cotonou Centre, Abomey-Calavi, Porto-Novo) et six sources de clients. Chaque indicateur vient d'un constat de l'audit, d'une action du plan ou d'une cible du cahier des charges.</p></div>
+      <div class="kpis">
+        <div class="panel kpi"><div class="top"><span class="l">Chiffre d'affaires, janv.–oct.</span><span class="tag brand">En hausse</span></div><span class="v">51,1 M</span><span class="s">+15,7 % sur un an, en FCFA</span></div>
+        <div class="panel kpi"><div class="top"><span class="l">Coût d'acquisition client</span><span class="tag ok">Atteint</span></div><span class="v">3 564</span><span class="s">Cible : 5 000 FCFA au plus</span><div class="bar" aria-label="71 % du plafond"><i style="width:71%"></i></div></div>
+        <div class="panel kpi"><div class="top"><span class="l">ROI marketing</span><span class="tag brand">En hausse</span></div><span class="v">308 %</span><span class="s">+19 % sur un an</span></div>
+        <div class="panel kpi"><div class="top"><span class="l">Nouveaux clients</span><span class="tag brand">En hausse</span></div><span class="v">1 055</span><span class="s">+30,2 % sur un an</span></div>
+        <div class="panel kpi"><div class="top"><span class="l">Panier moyen</span><span class="tag brand">En hausse</span></div><span class="v">26 697</span><span class="s">+1,7 % sur un an, en FCFA</span></div>
+      </div>
+      <p class="note" style="margin-top:12px">Données d'exemple construites pour l'exercice, en FCFA.</p>
+      <div class="grid g2" style="margin-top:24px">
+        <div class="panel axis"><span class="tag ok">23 indicateurs gardés</span><p>Financiers, acquisition, boutiques, sources, site et CRM, fidélisation : chacun avec sa formule, sa source, sa fréquence, sa cible et le livrable dont il vient.</p></div>
+        <div class="panel axis"><span class="tag bad">4 indicateurs écartés</span><p>Portée et likes (vanité : du buzz sans devis), coût par clic (remplacé par le coût d'acquisition), flyers et scans (suivi de campagne), avancement des tâches (déjà dans Trello).</p></div>
+      </div>
+      <div class="grid g4" style="margin-top:16px">
+        <div class="panel metric"><span class="v">391 %</span><span class="l">de ROI sur Instagram, la source la plus rentable</span></div>
+        <div class="panel metric"><span class="v">6 302 FCFA</span><span class="l">de coût d'acquisition sur Google, la source la plus chère</span></div>
+        <div class="panel metric"><span class="v">49,5 %</span><span class="l">de conversion en commande pour le direct et le parrainage</span></div>
+        <div class="panel metric"><span class="v">50 %</span><span class="l">du chiffre d'affaires réalisé par Cotonou Centre</span></div>
+      </div>
+      <div class="grid g2" style="margin-top:24px">
+        <button class="figure" type="button" data-zoom="img/f-tdb1.webp" data-cap="Filtres, indicateurs et comparaison entre deux mois"><span class="frame"><img src="img/f-tdb1.webp" alt="Tableau de bord, vue des indicateurs" loading="lazy" width="1621" height="715"></span><span class="cap">Filtres, indicateurs et comparaison mensuelle</span></button>
+        <button class="figure" type="button" data-zoom="img/f-tdb2.webp" data-cap="Analyses par boutique et par source"><span class="frame"><img src="img/f-tdb2.webp" alt="Tableau de bord, analyses" loading="lazy" width="1620" height="930"></span><span class="cap">Analyses par boutique et par source</span></button>
+      </div>
+      <h3 class="sub">Le rapport d'activité d'octobre</h3>
+      <div class="split">
+        <div class="deck" id="deck-f"></div>
+        <div class="grid" style="gap:14px">
+          <p class="prose">Six diapositives pour présenter au dirigeant deux campagnes (A sur Instagram avec une influenceuse, B sur Google Ads), analyser avec la méthode <b>Quoi / Donc / Et maintenant</b>, puis proposer des actions avec responsable, échéance et mesure de succès.</p>
+          <div class="grid g2" style="gap:10px">
+            <div class="panel metric"><span class="v">3 575 000</span><span class="l">FCFA de chiffre d'affaires estimé</span></div>
+            <div class="panel metric"><span class="v">1 950 000</span><span class="l">FCFA de résultat net estimé</span></div>
+            <div class="panel metric"><span class="v">200 %</span><span class="l">de ROI pour la campagne A</span></div>
+            <div class="panel metric"><span class="v">120 %</span><span class="l">de ROI global, B à 100 %</span></div>
+          </div>
+          <p class="prose" style="font-size:15px"><b>Décision proposée :</b> maintenir la campagne A, la plus rentable, et optimiser B avant toute hausse de budget.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter" id="f-bilan">
+    <div class="wrap">
+      <div class="signal" style="display:grid;gap:14px">
+        <small>Bilan de la formation</small>
+        <b>Un indicateur n'a de valeur que s'il mène à une décision.</b>
+        <p style="max-width:66ch">C'est ce qui m'a fait écarter les likes et le coût par clic au profit du coût d'un vrai client. Chaque livrable s'appuie sur le précédent ; c'est cette méthode que j'ai ensuite appliquée de bout en bout au projet Nettivert.</p>
+        <div><a class="btn prime" href="#nettivert">Voir le projet Nettivert <span class="arr">→</span></a></div>
+      </div>
+    </div>
+  </section>
+  </div>
+</div>
+
+<!-- ================= NETTIVERT ================= -->
+<div data-view="nettivert" id="v-nettivert" hidden>
+  <section class="dossier-h">
+    <div class="wrap">
+      <span class="eyebrow">Projet de spécialisation · Novembre 2026</span>
+      <h1>Nettivert : rendre visible une écologie <em class="hl">que l'on peut prouver</em></h1>
+      <p class="prose">Nettivert entretient les bureaux de PME et d'ETI avec des produits 100 % écologiques. Sur le papier, c'est un avantage. Dans les faits, l'entreprise perd des clients et des devis, ses prix baissent et ses clients la jugent traditionnelle. Le problème n'est pas la qualité du service : personne ne voit, ni ne peut vérifier, ce qui la distingue.</p>
+      <p class="note" style="margin-top:18px">Nettivert est un nom fictif, inspiré d'une société de nettoyage de bureaux existante. Les données internes sont simulées.</p>
+    </div>
+  </section>
+  <div class="chips" data-chips>
+    <div class="wrap">
+      <button type="button" data-to="c-contexte"><i>0</i>Contexte</button>
+      <button type="button" data-to="c-comprendre"><i>1</i>Comprendre</button>
+      <button type="button" data-to="c-positionner"><i>2</i>Positionner</button>
+      <button type="button" data-to="c-planifier"><i>3</i>Planifier</button>
+      <button type="button" data-to="c-coordonner"><i>4</i>Coordonner</button>
+      <button type="button" data-to="c-lancer"><i>5</i>Lancer</button>
+      <button type="button" data-to="c-piloter"><i>6</i>Piloter</button>
+      <button type="button" data-to="c-bilan"><i>✓</i>Bilan</button>
+    </div>
+  </div>
+
+  <div class="light">
+  <section class="chapter" id="c-contexte" style="border-top:0">
+    <div class="wrap">
+      <div class="ch-h"><div class="idx"><span class="hexnum">0</span><span class="eyebrow">Contexte</span></div><h2>L'entreprise, sa cible, ses objectifs</h2><p>30 salariés, trois villes (Cotonou, Abomey-Calavi, Porto-Novo), des contrats mensuels d'entretien. 37 clients établis pèsent 87 % du chiffre d'affaires récurrent. En face : des concurrents qui tirent les prix vers le bas et une image jugée vieillissante.</p></div>
+      <h3 class="sub">Une cible segmentée par comportement d'achat</h3>
+      <div class="grid g3">
+        <div class="panel seg"><span class="pct">47 %</span><div class="meter"><i style="width:47%"></i></div><h4>Chasseurs de prix</h4><p>Citent le prix en premier, passent par des appels d'offres : 62 % sont perdus. Ne pas s'aligner, c'est un segment volatil.</p></div>
+        <div class="panel seg"><span class="pct">38 %</span><div class="meter"><i style="width:38%"></i></div><h4>Fidèles de confiance</h4><p>Choisissent sur la fiabilité, arrivent par recommandation, pèsent 62 % du chiffre d'affaires actif. Les sécuriser par un suivi régulier.</p></div>
+        <div class="panel seg target"><span class="pct">10 %</span><div class="meter"><i style="width:10%"></i></div><h4>Acheteurs responsables <span class="tag gold" style="margin-left:6px;vertical-align:2px">Cible</span></h4><p>Citent d'abord l'écologie ou l'image ; s'informent sur LinkedIn (20 %) et Google (18 %). Cible de l'offre premium.</p></div>
+      </div>
+      <h3 class="sub">Huit objectifs chiffrés à douze mois</h3>
+      <div class="tbl"><table>
+        <thead><tr><th>Indicateur</th><th class="n">Départ (audit)</th><th class="n">Objectif</th></tr></thead>
+        <tbody>
+          <tr><td>Taux de transformation des devis</td><td class="n">13,5 % <span class="muted">(24,1 % en 2024)</span></td><td class="n"><span class="tgt">25 %</span></td></tr>
+          <tr><td>Part des devis perdus pour le prix</td><td class="n">48 %</td><td class="n"><span class="tgt">40 % au plus</span></td></tr>
+          <tr><td>Prix moyen mensuel par contrat</td><td class="n">493 000 FCFA</td><td class="n"><span class="tgt">540 000 FCFA</span></td></tr>
+          <tr><td>Cible qui sait que l'offre est écologique</td><td class="n">22 %</td><td class="n"><span class="tgt">50 %</span></td></tr>
+          <tr><td>Cible qui juge l'entreprise traditionnelle</td><td class="n">38 %</td><td class="n"><span class="tgt">20 % au plus</span></td></tr>
+          <tr><td>Abonnés LinkedIn</td><td class="n">441</td><td class="n"><span class="tgt">1 000</span></td></tr>
+          <tr><td>Coût d'acquisition par nouveau contrat</td><td class="n"><span class="muted">non suivi</span></td><td class="n"><span class="tgt">250 000 FCFA au plus</span></td></tr>
+          <tr><td>Retour sur investissement marketing</td><td class="n"><span class="muted">non suivi</span></td><td class="n"><span class="tgt">300 % au moins</span></td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </section>
+
+  <section class="chapter" id="c-comprendre">
+    <div class="wrap">
+      <div class="ch-h"><div class="idx"><span class="hexnum">1</span><span class="eyebrow">Comprendre</span></div><h2>Une érosion lente mais continue</h2><p>Le chiffre d'affaires recule, la marge baisse, le prix moyen des contrats diminue et les devis se transforment de moins en moins.</p></div>
+      <div class="tbl"><table>
+        <thead><tr><th>Indicateur</th><th class="n">2024</th><th class="n">2025</th><th class="n">2026 (janv.–oct.)</th></tr></thead>
+        <tbody>
+          <tr><td>Chiffre d'affaires (M FCFA)</td><td class="n">314,1</td><td class="n">309,3</td><td class="n"><span class="down">236,3</span></td></tr>
+          <tr><td>Marge brute</td><td class="n">29,7 %</td><td class="n">27,3 %</td><td class="n"><span class="down">25,1 %</span></td></tr>
+          <tr><td>Résultat (M FCFA)</td><td class="n">23,6</td><td class="n">14,7</td><td class="n"><span class="down">1,3</span></td></tr>
+          <tr><td>Prix moyen d'un contrat mensuel (FCFA)</td><td class="n">541 000</td><td class="n">514 000</td><td class="n"><span class="down">493 000</span></td></tr>
+          <tr><td>Taux de transformation des devis</td><td class="n">24,1 %</td><td class="n">16,7 %</td><td class="n"><span class="down">13,5 %</span></td></tr>
+          <tr><td>Contrats gagnés / perdus</td><td class="n">14 / 13</td><td class="n">11 / 14</td><td class="n"><span class="down">7 / 9</span></td></tr>
+          <tr><td>Clients actifs (fin de période)</td><td class="n">46</td><td class="n">43</td><td class="n"><span class="down">41</span></td></tr>
+        </tbody>
+      </table></div>
+      <div class="signal" style="margin-top:24px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:24px;align-items:center">
+        <p class="big">11 %</p>
+        <div><small>Le point décisif</small><p style="margin-top:6px">Seules 11 % des pertes de contrats viennent de la qualité du service. Le problème est commercial et d'image, pas opérationnel.</p></div>
+      </div>
+      <div class="grid g4" style="margin-top:16px">
+        <div class="panel metric"><span class="v">38 %</span><span class="l">jugent l'entreprise traditionnelle</span></div>
+        <div class="panel metric"><span class="v">22 %</span><span class="l">savent que l'offre est écologique</span></div>
+        <div class="panel metric"><span class="v">35 %</span><span class="l">paieraient plus pour une écologie prouvée (30 % peut-être)</span></div>
+        <div class="panel metric"><span class="v">56 %</span><span class="l">des clients actifs viennent du bouche-à-oreille</span></div>
+      </div>
+      <h3 class="sub">Démarrer, arrêter, continuer</h3>
+      <div class="split">
+        <div class="grid" style="gap:18px">
+          <div class="ssc">
+            <div class="go"><span class="tag ok">Démarrer</span><ul><li>Une marque fondée sur une écologie prouvée</li><li>Une offre premium pour les acheteurs responsables</li><li>Un CRM avec alerte de renouvellement</li><li>Un calendrier LinkedIn</li></ul></div>
+            <div class="stop"><span class="tag bad">Arrêter</span><ul><li>S'aligner sur le low-cost</li><li>Les appels d'offres jugés au seul prix</li><li>Suivre les contrats sur tableur</li><li>L'écologie en une ligne, sans preuve</li></ul></div>
+            <div class="cont"><span class="tag brand">Continuer</span><ul><li>Les produits 100 % écologiques</li><li>La qualité et la ponctualité</li><li>Le bouche-à-oreille, mieux organisé</li><li>Le suivi des clients établis</li></ul></div>
+          </div>
+          <div class="panel">
+            <span class="k">Trois axes structurent tout le projet</span>
+            <ol style="margin:12px 0 0;padding-left:20px;display:grid;gap:6px">
+              <li>Repositionner la marque sur une écologie prouvée.</li>
+              <li>Sortir de la guerre des prix avec une offre premium.</li>
+              <li>Organiser la fidélisation et la reconquête des clients perdus.</li>
+            </ol>
+            <p class="prose" style="margin-top:12px;font-size:15px">Le marketing ne reçoit que 0,5 % du chiffre d'affaires et 48 % des devis 2026 sont perdus sur le prix. Aucun concurrent ne cite de label : la place de la preuve est libre.</p>
+          </div>
+        </div>
+        <button class="figure" type="button" data-zoom="img/audit.webp" data-cap="Rapport d'audit Nettivert, 2 pages"><span class="frame"><img src="img/audit.webp" alt="Rapport d'audit Nettivert" loading="lazy" width="497" height="702"></span><span class="cap">Rapport d'audit, 2 pages</span></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter" id="c-positionner">
+    <div class="wrap">
+      <div class="ch-h"><div class="idx"><span class="hexnum">2</span><span class="eyebrow">Positionner</span></div><h2>Une écologie que l'on prouve</h2><p>La plateforme de marque transforme une affirmation que tout le monde peut faire en un engagement que l'on peut vérifier. Elle sert de référence à tous les messages, du site au communiqué.</p></div>
+      <div class="panel" style="display:grid;gap:22px">
+        <div><span class="k">Proposition de valeur unique</span><p class="uvp" style="margin-top:8px">Nettivert est le prestataire d'entretien de bureaux qui <em class="hl">prouve son écologie</em> : produits 100 % écologiques, méthodes de dosage et de tri documentées, mesures avant et après chaque intervention, consultables par le client.</p></div>
+        <dl class="dl">
+          <div><dt>Mission</dt><dd>Assurer aux PME et ETI des bureaux propres et sains avec des produits 100 % écologiques, et prouver chacun de nos engagements.</dd></div>
+          <div><dt>Vision 2030</dt><dd>Devenir la référence de l'entretien de bureaux à l'écologie prouvée à Cotonou, Abomey-Calavi et Porto-Novo.</dd></div>
+          <div><dt>Valeurs</dt><dd><b>Transparence</b> : chaque engagement a sa preuve. <b>Fiabilité</b> : ponctualité et qualité non négociables. <b>Respect</b> : des occupants, des équipes et de l'environnement.</dd></div>
+          <div><dt>Positionnement</dt><dd>Face à des concurrents qui se disent écologiques sans le démontrer et à des offres low-cost, Nettivert se place sur la preuve et la qualité, pas sur le prix.</dd></div>
+          <div><dt>Ton</dt><dd>Expert, transparent et proche : factuel, chiffré, sans jargon.</dd></div>
+        </dl>
+      </div>
+      <div class="signal" style="margin-top:16px"><small>Promesse et signature</small><b>« L'écologie, preuves à l'appui »</b><span>Entretien de bureaux, produits 100 % écologiques.</span></div>
+      <h3 class="sub">Le cercle d'or</h3>
+      <div class="golden">
+        <div class="rings" aria-hidden="true"><div class="q">Quoi</div><div class="c">Comment</div><div class="p">Pourquoi</div></div>
+        <dl>
+          <div><dt>Pourquoi</dt><dd>Parce qu'un lieu de travail propre ne devrait pas coûter à la santé des personnes ni à l'environnement, et que chacun doit pouvoir le vérifier.</dd></div>
+          <div><dt>Comment</dt><dd>En utilisant uniquement des produits écologiques, en documentant nos méthodes et en mesurant le résultat de chaque intervention.</dd></div>
+          <div><dt>Quoi</dt><dd>Des contrats d'entretien de bureaux pour PME et ETI, dont une Offre Premium qui inclut les preuves et les mesures.</dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter" id="c-planifier">
+    <div class="wrap">
+      <div class="ch-h"><div class="idx"><span class="hexnum">3</span><span class="eyebrow">Planifier</span></div><h2>Douze tâches datées et chiffrées</h2><p>Chaque tâche est décrite en QQOQCCP : qui, quoi, où, quand, comment, combien, et pourquoi (le constat de l'audit qu'elle corrige). Huit semaines, du 4 janvier 2027 au lancement de l'offre premium le 23 février.</p></div>
+      <div class="tbl"><table>
+        <thead><tr><th>Axe</th><th>Tâches</th><th>Pourquoi (audit)</th><th class="n">Budget (FCFA)</th></tr></thead>
+        <tbody>
+          <tr><td><b>1. Écologie prouvée</b></td><td>Plateforme de marque, dossier de preuves, refonte du site, calendrier LinkedIn</td><td>38 % jugent l'entreprise traditionnelle ; 22 % connaissent l'offre écologique</td><td class="n">3 150 000</td></tr>
+          <tr><td><b>2. Offre premium</b></td><td>Définition de l'offre, dossier et devis type, formation, campagne de lancement</td><td>48 % des devis perdus au prix ; transformation à 13,5 %</td><td class="n">2 250 000</td></tr>
+          <tr><td><b>3. Fidélisation</b></td><td>CRM avec alertes, enquête de sortie et avis, reconquête des 17 clients, tableau de bord</td><td>36 contrats perdus pour 32 gagnés ; suivi sur tableur</td><td class="n">1 100 000</td></tr>
+        </tbody>
+      </table></div>
+      <h3 class="sub">Rétro-planning avec marges de sécurité</h3>
+      <p class="prose" style="margin-bottom:16px">Loi de Murphy : chaque tâche reçoit une marge égale à 25 % de sa durée (un jour minimum), qui couvre aussi la validation du dirigeant. Une tâche ne démarre qu'une fois terminées, marge comprise, celles dont elle dépend. Survolez une barre pour le détail.</p>
+      <div class="gantt"><div class="g-in" id="gantt"></div></div>
+      <div class="legend"><span><i style="--c:var(--lagoon)"></i>Axe 1</span><span><i style="--c:var(--papaya)"></i>Axe 2</span><span><i style="--c:var(--lilac)"></i>Axe 3</span><span><i class="h"></i>Marge de sécurité</span><span><i style="--c:var(--ink);width:3px"></i>Jour J, 23 février</span></div>
+      <h3 class="sub">Le budget : 7,15 M FCFA, soit 2,3 % du chiffre d'affaires 2025 (contre 0,5 %)</h3>
+      <div class="split">
+        <div class="panel">
+          <div class="stack" role="img" aria-label="Budget : écologie prouvée 3,15 M, offre premium 2,25 M, fidélisation 1,1 M, réserve 0,65 M">
+            <div class="c-pet" style="flex:3150">Axe 1</div>
+            <div class="c-or" style="flex:2250">Axe 2</div>
+            <div class="c-ard" style="flex:1100">Axe 3</div>
+            <div class="c-pale" style="flex:650">Rés.</div>
+          </div>
+          <div class="bleg">
+            <div><i class="c-pet"></i>Écologie prouvée<b>3 150 000</b></div>
+            <div><i class="c-or"></i>Offre premium<b>2 250 000</b></div>
+            <div><i class="c-ard"></i>Fidélisation<b>1 100 000</b></div>
+            <div><i class="c-pale"></i>Réserve de 10 %<b>650 000</b></div>
+          </div>
+          <p class="prose" style="margin-top:16px;font-size:15px">On saisit le montant engagé (bon de commande signé) et réalisé (facture payée) ; reste à engager, écart et pourcentage consommé se calculent seuls, et une alerte s'affiche en cas de dépassement. L'essentiel tombe en janvier (2,3 M FCFA) et février (4,2 M FCFA).</p>
+        </div>
+        <button class="figure" type="button" data-zoom="img/budget.webp" data-cap="SUIVI_BUDGET_PS.xlsx"><span class="frame"><img src="img/budget.webp" alt="Fichier de suivi budgétaire" loading="lazy" width="1592" height="653"></span><span class="cap">Fichier de suivi budgétaire (Excel)</span></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter" id="c-coordonner">
+    <div class="wrap">
+      <div class="ch-h"><div class="idx"><span class="hexnum">4</span><span class="eyebrow">Coordonner</span></div><h2>Coordonner l'agence et l'équipe</h2><p>Nettivert n'a ni graphiste ni vidéaste. J'ai rédigé un brief pour confier à une agence le kit visuel du lancement : visuels LinkedIn, vidéo de démonstration de 45 secondes, supports partenaires et kit presse. Budget maximal : 600 000 FCFA, réglé en trois fois.</p></div>
+      <h3 class="sub">Calendrier des rendus 2027</h3>
+      <div class="cal">
+        <div><b>15/01</b><span>Réception du devis de l'agence</span></div>
+        <div><b>18/01</b><span>Démarrage après validation</span></div>
+        <div><b>22/01</b><span>Deux pistes créatives</span></div>
+        <div><b>29/01</b><span>Dossier de présentation</span></div>
+        <div><b>03/02</b><span>Visuels LinkedIn</span></div>
+        <div><b>10/02</b><span>Publicités et vidéo de démonstration</span></div>
+        <div><b>12/02</b><span>Kit presse et kakémono</span></div>
+        <div class="last"><b>16/02</b><span>Date limite absolue, une semaine avant le Jour J</span><span class="tag bad">Date limite</span></div>
+      </div>
+      <div class="split" style="margin-top:28px">
+        <div class="panel" style="display:grid;gap:18px">
+          <span class="k">Direction artistique de Nettivert</span>
+          <div class="swatches">
+            <div><i style="background:#1F5C4A"></i>#1F5C4A</div>
+            <div><i style="background:#E6A100"></i>#E6A100</div>
+            <div><i style="background:#DDEBE4"></i>#DDEBE4</div>
+            <div><i style="background:#222222"></i>#222222</div>
+          </div>
+          <p class="prose" style="font-size:15px">Typographie Source Sans 3. L'agence garde la main sur la composition, le traitement photo, le rythme de la vidéo et les pictogrammes.</p>
+          <div class="grid g2" style="gap:12px">
+            <div><span class="tag ok">Références</span><ul class="list" style="margin-top:10px;font-size:15px"><li><span>Chiffres sourcés en grand format</span></li><li><span>Avant / après au même cadrage</span></li></ul></div>
+            <div><span class="tag bad">Anti-références</span><ul class="list" style="margin-top:10px;font-size:15px"><li><span>Photos de banque d'images</span></li><li><span>Feuilles et planètes décoratives</span></li><li><span>Mise en avant du prix</span></li></ul></div>
+          </div>
+        </div>
+        <button class="figure" type="button" data-zoom="img/brief.webp" data-cap="Brief créatif, 2 pages"><span class="frame"><img src="img/brief.webp" alt="Brief créatif" loading="lazy" width="497" height="702" style="aspect-ratio:4/3.4;object-fit:cover;object-position:top"></span><span class="cap">Brief créatif, 2 pages</span></button>
+      </div>
+      <h3 class="sub">Le suivi au quotidien : un Kanban</h3>
+      <p class="prose">Une carte par tâche, avec axe, responsable, échéance (marge comprise) et dépendances. Point de dix minutes chaque matin. Ci-dessous, l'état prévu au 25 janvier 2027 si le rétro-planning est tenu.</p>
+      <div class="tabs" role="group" aria-label="Filtrer par axe" style="margin-top:16px">
+        <button type="button" data-kf="all" aria-pressed="true">Tous</button>
+        <button type="button" data-kf="a1" aria-pressed="false">Axe 1</button>
+        <button type="button" data-kf="a2" aria-pressed="false">Axe 2</button>
+        <button type="button" data-kf="a3" aria-pressed="false">Axe 3</button>
+      </div>
+      <div class="kanban" id="kanban"></div>
+    </div>
+  </section>
+
+  <section class="chapter" id="c-lancer">
+    <div class="wrap">
+      <div class="ch-h"><div class="idx"><span class="hexnum">5</span><span class="eyebrow">Lancer</span></div><h2>Le lancement 360°, mardi 23 février 2027</h2><p>Le client doit entendre la même chose, qu'il découvre Nettivert sur LinkedIn, dans la presse ou lors d'une démonstration. Tous les supports reprennent la même promesse et renvoient vers la même page.</p></div>
+      <div class="signal"><small>Message commun à tous les canaux</small><b>« Votre prestataire peut-il prouver qu'il est écologique ? Nous, oui. »</b><span>Promesse : « L'écologie, preuves à l'appui »</span></div>
+      <h3 class="sub">La cartographie phygitale</h3>
+      <p class="prose" style="margin-bottom:16px">Chaque action fait passer le contact du physique au numérique, puis le ramène vers une rencontre réelle. Chaque canal a son lien ou son QR code, pour savoir d'où vient chaque demande.</p>
+      <div class="flow">
+        <div class="fh"><span>Support physique</span><span></span><span>Pont numérique</span><span></span><span>Retour au physique</span></div>
+        <div class="fr"><div>Dossier Premium remis en rendez-vous</div><span>→</span><div>QR code vers la fiche Premium et le devis en ligne</div><span>→</span><div>Visite technique sous 48 heures</div></div>
+        <div class="fr"><div>Fiche « Ce que nous avons utilisé aujourd'hui » chez les 41 clients</div><span>→</span><div>QR code vers les fiches produits et la demande d'avis Google</div><span>→</span><div>Passage à l'Offre Premium proposé par le chef d'équipe</div></div>
+        <div class="fr"><div>Petit-déjeuner de démonstration (Jour J)</div><span>→</span><div>Kakémono avec QR code : inscription à l'essai, saisie dans le CRM</div><span>→</span><div>Essai d'une semaine sur un site du prospect</div></div>
+        <div class="fr"><div>Appel du dirigeant aux 17 clients perdus au prix</div><span>→</span><div>SMS avec lien vers l'offre et l'invitation</div><span>→</span><div>Invitation au petit-déjeuner, puis essai</div></div>
+        <div class="fr"><div>Publications LinkedIn et communiqué de presse</div><span>→</span><div>Lien court suivi vers la page de l'offre</div><span>→</span><div>Rappel sous 24 heures et visite sur site</div></div>
+      </div>
+      <h3 class="sub">Influence B2B et relations presse</h3>
+      <div class="grid g4">
+        <div class="panel axis"><span class="k">Le fournisseur</span><p>Garantit la composition des produits et nos méthodes : une caution technique que Nettivert ne peut pas se donner seule.</p></div>
+        <div class="panel axis"><span class="k">Un centre d'affaires</span><p>Accueille la démonstration à Cotonou et ouvre l'accès à ses entreprises locataires (à solliciter).</p></div>
+        <div class="panel axis"><span class="k">Les clients satisfaits</span><p>Témoignent au petit-déjeuner et dans des études de cas LinkedIn, appuyés sur les 56 % venus par recommandation.</p></div>
+        <div class="panel axis"><span class="k">Le dirigeant</span><p>Prend la parole sur LinkedIn en expert de l'entretien écologique. Kit presse sous embargo à J-8.</p></div>
+      </div>
+      <h3 class="sub">Le rétro-planning synchronisé</h3>
+      <div class="phases">
+        <div class="panel"><span class="k">Du 08/02 au 22/02 · J-15</span><h4>Teasing</h4><ul class="list" style="font-size:15px"><li><span>LinkedIn et invitations (J-15)</span></li><li><span>Publicité ciblée (J-11)</span></li><li><span>Kit presse sous embargo (J-8)</span></li><li><span>Vidéo de démonstration (J-5)</span></li><li><span>Tests des QR codes et du CRM (J-1)</span></li></ul></div>
+        <div class="panel j"><span class="tag gold">23/02 · Jour J</span><h4>Lancement</h4><ul class="list" style="font-size:15px"><li><span>Petit-déjeuner avec mesure avant / après en direct</span></li><li><span>Mise en ligne de la fiche Premium</span></li><li><span>Communiqué et annonce LinkedIn au même moment</span></li></ul></div>
+        <div class="panel"><span class="k">Du 24/02 au 09/03 · J+1</span><h4>Amplification</h4><ul class="list" style="font-size:15px"><li><span>Photos et vidéo de la matinée</span></li><li><span>Rappel de chaque contact sous 24 heures</span></li><li><span>Relais des partenaires (J+3), étude de cas (J+7)</span></li><li><span>Bilan avec le tableau de bord (J+14)</span></li></ul></div>
+      </div>
+      <div class="grid g4" style="margin-top:16px">
+        <div class="panel metric"><span class="v">1,6 M FCFA</span><span class="l">de budget de campagne (tâche A2.4)</span></div>
+        <div class="panel metric"><span class="v">20</span><span class="l">devis visés après le lancement</span></div>
+        <div class="panel metric"><span class="v">7</span><span class="l">contrats visés, pour un coût d'acquisition d'environ 229 000 FCFA</span></div>
+        <div class="panel metric"><span class="v">4 sur 17</span><span class="l">clients perdus au prix à reconquérir</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter" id="c-piloter">
+    <div class="wrap">
+      <div class="ch-h"><div class="idx"><span class="hexnum">6</span><span class="eyebrow">Piloter</span></div><h2>Piloter par la donnée</h2><p>Le tableau de bord Excel sépare données brutes, calculs et visualisation. Des filtres par année, ville, source et période recalculent tout. Cinq indicateurs répondent aux trois freins de l'audit et à la rentabilité ; chaque carte indique si l'objectif est atteint.</p></div>
+      <div class="kpis">
+        <div class="panel kpi"><div class="top"><span class="l">Chiffre d'affaires récurrent</span><span class="tag bad">Non atteint</span></div><span class="v">197,1 M</span><span class="s">−10,5 % sur un an, en FCFA</span></div>
+        <div class="panel kpi"><div class="top"><span class="l">Transformation des devis</span><span class="tag bad">Non atteint</span></div><span class="v">13,5 %</span><span class="s">Cible : 25 %</span><div class="bar" aria-label="54 % de la cible"><i style="width:54%"></i></div></div>
+        <div class="panel kpi"><div class="top"><span class="l">Prix moyen par contrat</span><span class="tag bad">Non atteint</span></div><span class="v">493 000</span><span class="s">Cible : 540 000 FCFA</span><div class="bar" aria-label="91 % de la cible"><i style="width:91%"></i></div></div>
+        <div class="panel kpi"><div class="top"><span class="l">Coût d'acquisition client</span><span class="tag ok">Atteint</span></div><span class="v">171 143</span><span class="s">Plafond : 250 000 FCFA</span><div class="bar" aria-label="68 % du plafond"><i style="width:68%"></i></div></div>
+        <div class="panel kpi"><div class="top"><span class="l">Retour sur investissement</span><span class="tag ok">Atteint</span></div><span class="v">1 347 %</span><span class="s">Cible : 300 %</span><div class="bar" aria-label="Cible dépassée"><i style="width:100%"></i></div></div>
+      </div>
+      <p class="note" style="margin-top:12px">Période de janvier à octobre 2026, données simulées. Les barres montrent la position par rapport à la cible ou au plafond.</p>
+      <div class="formula" style="margin-top:16px">ROI = (chiffre d'affaires annualisé des nouveaux contrats × marge de 35 % − dépenses marketing) ÷ dépenses marketing</div>
+      <div class="grid g2" style="margin-top:24px">
+        <button class="figure" type="button" data-zoom="img/tdb-kpi.webp" data-cap="Filtres et indicateurs complémentaires"><span class="frame"><img src="img/tdb-kpi.webp" alt="Tableau de bord Nettivert, indicateurs" loading="lazy" width="1164" height="660"></span><span class="cap">Filtres et indicateurs complémentaires</span></button>
+        <button class="figure" type="button" data-zoom="img/tdb-tendances.webp" data-cap="Tendances mensuelles face aux objectifs"><span class="frame"><img src="img/tdb-tendances.webp" alt="Tableau de bord Nettivert, tendances" loading="lazy" width="1164" height="458"></span><span class="cap">Tendances mensuelles face aux objectifs</span></button>
+      </div>
+      <h3 class="sub">Le rapport d'activité mensuel</h3>
+      <p class="prose" style="margin-bottom:18px">Chaque fin de mois, le tableau de bord alimente un rapport de 30 minutes pour le dirigeant. Le premier, sur janvier à octobre 2026, sert de point de départ.</p>
+      <div class="qde">
+        <div class="panel"><h4>Quoi</h4><p>Le chiffre d'affaires récurrent recule de 10,5 %. 7 contrats signés, 9 perdus. Près d'un devis sur deux est perdu sur le prix. Le coût d'acquisition et le ROI sont bons, car le marketing coûte très peu.</p></div>
+        <div class="panel"><h4>Donc</h4><p>Le frein est commercial, pas le coût d'acquisition : chaque franc investi rapporte, mais les signatures ne compensent pas les départs. La recommandation apporte 5 des 7 nouveaux contrats.</p></div>
+        <div class="panel"><h4>Et maintenant</h4><p>Alertes CRM (20/01), formation à défendre le prix (04/02), reconquête des 17 clients (16/02), Offre Premium (23/02), budget porté à 7,15 M FCFA avec un coût d'acquisition sous 250 000 FCFA.</p></div>
+      </div>
+      <div class="deck" id="deck-ps" style="margin-top:24px;max-width:900px"></div>
+    </div>
+  </section>
+
+  <section class="chapter" id="c-bilan">
+    <div class="wrap">
+      <div class="ch-h"><span class="eyebrow">Bilan</span><h2>Ce que j'ai amélioré, ce que j'en retiens</h2></div>
+      <div class="grid g3" style="margin-bottom:24px">
+        <div class="panel axis"><h4>Des objectifs mesurables</h4><p>Chaque objectif a une situation de départ tirée de l'audit, une cible chiffrée et un indicateur suivi chaque mois.</p></div>
+        <div class="panel axis"><h4>Un budget complet</h4><p>Communication, événement, presse et agence, avec une réserve de 10 % et un suivi prévu, engagé, réalisé.</p></div>
+        <div class="panel axis"><h4>Un rétro-planning opérationnel</h4><p>Responsable, échéance, marge et dépendances pour chaque tâche ; lancement daté de J-15 à J+14.</p></div>
+        <div class="panel axis"><h4>Un cadrage clair du prestataire</h4><p>Livrables, formats, dates, budget, droits et direction artistique dans le brief.</p></div>
+        <div class="panel axis"><h4>Des chiffres cohérents</h4><p>Chaque chiffre vient de l'audit ; dates, budgets et responsables sont identiques d'un livrable à l'autre.</p></div>
+        <div class="panel axis" style="border:2px solid var(--papaya)"><h4>Face à la guerre des prix</h4><p>La réponse n'est pas de baisser encore ses tarifs, mais de rendre visible une valeur que le client peut vérifier.</p></div>
+      </div>
+      <p class="prose" style="font-size:17px">Une stratégie marketing tient d'abord à sa cohérence : un constat chiffré justifie un axe, l'axe se traduit en tâches datées et budgétées, les tâches produisent des supports qui disent tous la même chose, et le tableau de bord vérifie si cela fonctionne. Si un maillon manque, l'ensemble perd sa crédibilité.</p>
+      <h3 class="sub">Les livrables du projet</h3>
+      <div class="tbl"><table>
+        <thead><tr><th>Livrable</th><th>Contenu</th><th>Format</th></tr></thead>
+        <tbody>
+          <tr><td><b>Rapport d'audit</b></td><td>Freins, leviers, segments, Démarrer / Arrêter / Continuer</td><td>PDF, 2 pages</td></tr>
+          <tr><td><b>Plan d'action marketing</b></td><td>QQOQCCP, rétro-planning, objectifs, dates recalculées automatiquement</td><td>PDF et Excel</td></tr>
+          <tr><td><b>Suivi budgétaire</b></td><td>Prévu, engagé, réalisé, alertes et échéancier mensuel</td><td>Excel</td></tr>
+          <tr><td><b>Brief créatif</b></td><td>Brief destiné à l'agence créative</td><td>PDF, 2 pages</td></tr>
+          <tr><td><b>Plan de lancement</b></td><td>Teasing, Jour J, amplification, phygital</td><td>PDF, 2 pages</td></tr>
+          <tr><td><b>Tableau de bord</b></td><td>5 indicateurs, ROI dynamique, filtres, 9 graphiques</td><td>Excel</td></tr>
+          <tr><td><b>Rapport mensuel</b></td><td>Quoi / Donc / Et maintenant</td><td>PDF et PowerPoint</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </section>
+  </div>
+</div>
+
+<!-- ================= PARCOURS ================= -->
+<div data-view="parcours" id="v-parcours" hidden>
+  <section class="dossier-h">
+    <div class="wrap profile">
+      <div class="portrait">
+        <img src="img/photo-profil.webp" alt="Isidore Laly" width="900" height="1184">
+        <span class="badge tag gold">Basé au Bénin</span>
+      </div>
+      <div>
+        <span class="eyebrow">Profil</span>
+        <h1>Du porte-à-porte au <em class="hl">pilotage d'une zone</em></h1>
+        <div class="grid" style="gap:14px">
+          <p class="prose">Six ans de progression continue dans la vente et l'acquisition : agent commercial, puis superviseur, puis responsable d'un réseau de 75 agents sur trois communes.</p>
+          <p class="prose">Je manage des équipes terrain, j'élabore des stratégies d'acquisition, je développe des partenariats et j'analyse les indicateurs de performance. Titulaire d'une licence en finance et comptabilité et en Master 1 de gestion de projet, je développe aussi des compétences en marketing digital, en gestion de projets numériques et en intelligence artificielle.</p>
+        </div>
+        <div class="facts">
+          <div><span class="k">Poste</span><b>Responsable Acquisition</b></div>
+          <div><span class="k">Périmètre</span><b>3 communes, 3 superviseurs mPOS, 75 agents</b></div>
+          <div><span class="k">Formation</span><b>Licence Finance Comptabilité, Master 1 Gestion de projet</b></div>
+          <div><span class="k">Spécialité</span><b>Projet marketing digital 360° (D-CLIC, OIF)</b></div>
+        </div>
+        <div class="skills">
+          <span class="tag">Acquisition clients</span><span class="tag">Management terrain</span><span class="tag">Indicateurs et reporting</span><span class="tag">Partenariats</span><span class="tag">Marketing digital</span><span class="tag">Gestion de projet</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="light">
+  <section class="sec">
+    <div class="wrap">
+      <div class="sec-h"><span class="eyebrow">Expérience</span><h2>Une progression construite sur le terrain</h2><p>Chaque poste m'a donné plus d'équipes à encadrer et plus de résultats à porter.</p></div>
+      <div class="exp">
+        <article class="job now panel">
+          <div class="when"><span class="tag gold">2024 – aujourd'hui</span><span class="tag ok">Poste actuel</span></div>
+          <h3>Responsable Acquisition</h3>
+          <p class="org">Acquisition commerciale sur trois communes, Bénin</p>
+          <ul>
+            <li>Pilotage des activités d'acquisition commerciale sur trois communes.</li>
+            <li>Management de 3 superviseurs mPOS et coordination d'un réseau de 75 agents commerciaux.</li>
+            <li>Élaboration et déploiement des plans d'action commerciaux annuels et mensuels.</li>
+            <li>Suivi des indicateurs, analyse des performances et plans correctifs.</li>
+            <li>Gestion des bases de données commerciales sous Excel ; vérification des données pour les états de paiement.</li>
+            <li>Partenariats avec les points de vente Mobile Money, les mairies, les arrondissements et les acteurs locaux.</li>
+          </ul>
+          <div class="res">
+            <div class="stat"><b>+30 %</b><span>de New Add en glissement annuel</span></div>
+            <div class="stat"><b>45 → 75</b><span>agents dans l'effectif commercial</span></div>
+            <div class="stat"><b>33 → 45 %</b><span>de part de marché, 12 points gagnés</span></div>
+          </div>
+        </article>
+        <article class="job panel">
+          <div class="when"><span class="tag brand">2022 – 2024</span><span class="tag brand">Équipe de 17 à 33 agents</span></div>
+          <h3>Superviseur mPOS</h3>
+          <p class="org">Supervision d'une équipe d'agents commerciaux</p>
+          <ul>
+            <li>Supervision d'une équipe passée de 17 à 33 collaborateurs.</li>
+            <li>Planification des activités et coordination des opérations terrain.</li>
+            <li>Recrutement, formation, encadrement et accompagnement des agents.</li>
+            <li>Animations commerciales de jour comme de nuit.</li>
+            <li>Stocks de cartes SIM et équipements ; suivi des agents, abonnés et points de vente actifs.</li>
+            <li>Opérations lors de la Grotte mariale de Dassa et de la Fête de l'igname à Savalou.</li>
+          </ul>
+        </article>
+        <article class="job panel">
+          <div class="when"><span class="tag brand">2020 – 2022</span><span class="tag brand">Parakou</span></div>
+          <h3>Agent commercial</h3>
+          <p class="org">Teddycom, Parakou</p>
+          <ul>
+            <li>Commercialisation des cartes SIM, téléphones, produits et services MTN.</li>
+            <li>Promotion des offres MTN Business et des services Mobile Money.</li>
+            <li>Prospection, développement du portefeuille clients, création de comptes Mobile Money.</li>
+            <li>Vente directe, porte-à-porte et animations sur les marchés.</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" style="padding-top:0">
+    <div class="wrap">
+      <div class="sec-h"><span class="eyebrow">Formation</span><h2>Une base en finance, une spécialisation en projet</h2></div>
+      <div class="grid g2">
+        <div class="panel">
+          <span class="k">Formation académique</span>
+          <div class="edu" style="margin-top:8px">
+            <div><span class="y">2026</span><div><b>Master 1 en Gestion de projet</b><span>Institut Universitaire de Formation et d'Insertion Professionnelle</span></div><span class="tag brand">En cours</span></div>
+            <div><span class="y">2021</span><div><b>Licence en Finance Comptabilité</b><span>FASEG, Université de Parakou</span></div><span></span></div>
+            <div><span class="y">2018</span><div><b>Baccalauréat série D</b><span>CEG Kraké Plage</span></div><span></span></div>
+          </div>
+        </div>
+        <div class="panel">
+          <span class="k">Certifications</span>
+          <div class="edu" style="margin-top:8px">
+            <div><span class="y">Sept.–nov. 2026</span><div><b>Gestion de projet marketing digital 360°</b><span>D-CLIC, OIF</span></div><span class="tag ok">Terminée</span></div>
+            <div><span class="y">Mai 2026</span><div><b>Marketing digital</b><span>D-CLIC, OIF</span></div><span class="tag ok">Certifié</span></div>
+            <div><span class="y">Mars 2026</span><div><b>IA et maîtrise du prompting</b><span>Formation associée à Anthropic</span></div><span></span></div>
+            <div><span class="y">2026</span><div><b>Anglais</b><span>American Corner, Université de Parakou</span></div><span></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" style="padding-top:0">
+    <div class="wrap">
+      <div class="sec-h"><span class="eyebrow">Compétences</span><h2>Ce que j'apporte à une équipe</h2></div>
+      <div class="grid g3">
+        <div class="panel">
+          <span class="k">Compétences professionnelles</span>
+          <ul class="list" style="margin-top:14px;font-size:15px">
+            <li><span>Management et leadership d'équipes</span></li><li><span>Stratégie commerciale et acquisition</span></li><li><span>Partenariats et négociation</span></li><li><span>Analyse des performances et reporting</span></li><li><span>Gestion et coordination de projets</span></li><li><span>Marketing digital et communication</span></li><li><span>Formation et coaching des équipes</span></li><li><span>Réflexion stratégique et adaptation</span></li>
+          </ul>
+        </div>
+        <div class="panel"><span class="k">Outils</span><div class="tools" id="tools" style="margin-top:14px"></div></div>
+        <div class="panel"><span class="k">Langues</span>
+          <div class="langs" style="margin-top:14px">
+            <div><b>Français</b><span>Avancé</span></div><div><b>Anglais</b><span>Intermédiaire</span></div><div><b>Fon</b><span>Avancé</span></div><div><b>Goun</b><span>Avancé</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" style="padding-top:0">
+    <div class="wrap">
+      <div style="display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap;margin-bottom:24px">
+        <div class="sec-h" style="margin:0"><span class="eyebrow">Curriculum vitæ</span><h2>Mon CV en deux pages</h2></div>
+        <a class="btn prime" href="CV_Isidore_Laly.pdf" target="_blank" rel="noopener">Ouvrir le CV en PDF <span class="arr">↗</span></a>
+      </div>
+      <div class="cv">
+        <button class="figure" type="button" data-zoom="img/cv-1.webp" data-cap="CV, page 1"><span class="frame"><img src="img/cv-1.webp" alt="CV, page 1" loading="lazy" width="1075" height="1521"></span></button>
+        <button class="figure" type="button" data-zoom="img/cv-2.webp" data-cap="CV, page 2"><span class="frame"><img src="img/cv-2.webp" alt="CV, page 2" loading="lazy" width="1075" height="1521"></span></button>
+      </div>
+    </div>
+  </section>
+  </div>
+</div>
+
+<!-- ================= CONTACT ================= -->
+<div data-view="contact" id="v-contact" hidden>
+  <section class="contact-h">
+    <div class="wrap">
+      <div class="top">
+        <div>
+          <span class="eyebrow">Contact</span>
+          <h1>Parlons de votre prochain projet</h1>
+        </div>
+        <span class="blob"><img src="img/photo-contact.webp" alt="Isidore Laly" width="400" height="433"></span>
+      </div>
+      <p class="prose" style="margin-top:28px;font-size:19px">Une question sur Nettivert, sur mon parcours ou une proposition : écrivez-moi, je réponds rapidement.</p>
+      <div class="channels">
+        <div class="channel"><span class="k">E-mail</span><a class="val" href="mailto:isidorelaly@gmail.com">isidorelaly@gmail.com</a><button class="copy" type="button" data-copy="isidorelaly@gmail.com">Copier</button></div>
+        <div class="channel"><span class="k">Téléphone</span><span class="val">+229 01 97 97 87 71</span><button class="copy" type="button" data-copy="+229 01 97 97 87 71">Copier</button></div>
+        <div class="channel"><span class="k">WhatsApp</span><a class="val" href="https://wa.me/2290197978771?text=Bonjour%20Isidore%2C%20j%27ai%20consult%C3%A9%20votre%20portfolio." target="_blank" rel="noopener">Écrire sur WhatsApp ↗</a><button class="copy" type="button" data-copy="+229 01 97 97 87 71">Copier</button></div>
+        <div class="channel"><span class="k">LinkedIn</span><a class="val" href="https://www.linkedin.com/in/isidore-laly-1a8b91296" target="_blank" rel="noopener">isidore-laly ↗</a><button class="copy" type="button" data-copy="https://www.linkedin.com/in/isidore-laly-1a8b91296">Copier</button></div>
+      </div>
+      <div class="cta" style="margin-top:36px"><a class="btn prime" href="CV_Isidore_Laly.pdf" target="_blank" rel="noopener" data-cursor="PDF">Ouvrir mon CV <span class="arr">↗</span></a></div>
+    </div>
+  </section>
+  <div class="marquee" data-marquee data-dir="-1" data-mspeed=".6" data-skew aria-hidden="true">
+    <div class="mq-track"><span>Disponible<i style="--c:var(--sun)"></i><em>Projets digitaux</em><i style="--c:var(--lagoon)"></i>Cotonou<i style="--c:var(--lilac)"></i><em>Marketing 360°</em><i style="--c:var(--papaya)"></i></span></div>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <a class="fbig" href="#contact" data-cursor="Écrire" style="text-decoration:none">Isidore Laly</a>
+    <div class="frow">
+      <span>Chef de projet marketing digital 360° · Cotonou, Bénin</span>
+      <span><a href="#formation">Formation</a> · <a href="#nettivert">Nettivert</a> · <a href="#parcours">Parcours</a> · <a href="#contact">Contact</a></span>
+      <span>© 2026 Isidore Laly</span>
+    </div>
+  </div>
+</footer>
+
+<dialog id="pal" aria-label="Navigation rapide">
+  <div class="in"><i aria-hidden="true"></i><input id="pal-q" type="text" placeholder="Aller à… (audit, Gantt, indicateurs, contact)" autocomplete="off" aria-label="Rechercher une section"></div>
+  <ul id="pal-list" role="listbox"></ul>
+</dialog>
+
+<dialog id="lb">
+  <div class="box">
+    <div class="lbb"><p id="lb-cap"></p><button class="copy" type="button" id="lb-close">Fermer</button></div>
+    <img id="lb-img" alt="">
+  </div>
+</dialog>
+
+<div id="tip" hidden></div>
+
+<script>
+(function(){
+  var $=function(s,c){return (c||document).querySelector(s)}, $$=function(s,c){return [].slice.call((c||document).querySelectorAll(s))};
+  var reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var fine=window.matchMedia&&matchMedia("(pointer: fine)").matches;
+  var NB=" ";
+  var COL={papaya:"#FF5B2E",lilac:"#A98BFF",lagoon:"#18C8A0",sun:"#FFCF3A",rose:"#FF7AB6",ink:"#0E0C14",cream:"#F4EFE7"};
+  var WORLD={accueil:COL.papaya,formation:COL.papaya,nettivert:COL.lagoon,parcours:COL.lilac,contact:COL.sun};
+  var NAMES={accueil:"Accueil",formation:"Formation",nettivert:"Nettivert",parcours:"Parcours",contact:"Contact"};
+  var TITLES={accueil:"Isidore Laly · Portfolio",formation:"Formation · Isidore Laly",nettivert:"Nettivert · Isidore Laly",parcours:"Parcours · Isidore Laly",contact:"Contact · Isidore Laly"};
+  document.documentElement.classList.add("js");
+
+  /* ---------- Horloge Cotonou (UTC+1) ---------- */
+  function tick(){var d=new Date(Date.now()+3600e3);$("#clk").textContent=("0"+d.getUTCHours()).slice(-2)+":"+("0"+d.getUTCMinutes()).slice(-2);}
+  tick();setInterval(tick,15000);
+
+  /* ---------- Découpage des lettres et des mots ---------- */
+  $$(".giant .ch").forEach(function(el){var t=el.textContent,i0=+(el.getAttribute("data-i0")||0);el.textContent="";el.setAttribute("aria-hidden","true");
+    t.split("").forEach(function(c,i){var s=document.createElement("span");s.className="ltr";s.style.setProperty("--i",i+i0);s.textContent=c;el.appendChild(s);});});
+  $$(".split-words").forEach(function(el){var t=el.textContent.trim();el.setAttribute("aria-label",t);
+    el.innerHTML=t.split(/\s+/).map(function(w,i){return '<span class="w" aria-hidden="true"><span style="--i:'+i+'">'+w+'</span></span>';}).join(" ");});
+
+  /* ---------- Fluide de couleurs (WebGL) ---------- */
+  var fluidDraw=null;
+  (function(){
+    var c=$("#fluid");if(!c)return;var gl=null;try{gl=c.getContext("webgl",{antialias:false,alpha:false});}catch(e){}
+    if(!gl){c.remove();return;}
+    var vs="attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}";
+    var fs="precision mediump float;uniform vec2 r;uniform float t;uniform vec2 m;"+
+      "float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}"+
+      "float n(vec2 p){vec2 i=floor(p),f=fract(p);vec2 u=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1.,0.)),u.x),mix(h(i+vec2(0.,1.)),h(i+vec2(1.,1.)),u.x),u.y);}"+
+      "float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<5;i++){v+=a*n(p);p=p*2.02+vec2(1.7,9.2);a*=.5;}return v;}"+
+      "void main(){vec2 uv=gl_FragCoord.xy/r;vec2 p=uv;p.x*=r.x/r.y;p*=1.6;float tt=t*.07;"+
+      "vec2 q=vec2(fbm(p+vec2(0.,tt)),fbm(p+vec2(5.2,1.3)-tt));"+
+      "vec2 w=vec2(fbm(p+2.6*q+vec2(1.7,9.2)+.15*tt+m),fbm(p+2.6*q+vec2(8.3,2.8)-.12*tt-m));"+
+      "float f=fbm(p+2.2*w);"+
+      "vec3 col=mix(vec3(.663,.545,1.),vec3(1.,.357,.18),smoothstep(.3,.7,f));"+
+      "col=mix(col,vec3(.094,.784,.627),smoothstep(.45,.85,w.y));"+
+      "col=mix(col,vec3(1.,.812,.227),smoothstep(.5,.9,q.x)*.9);"+
+      "col=mix(col,vec3(1.,.478,.714),smoothstep(.55,.95,w.x)*.55);"+
+      "gl_FragColor=vec4(col,1.);}";
+    function sh(type,src){var o=gl.createShader(type);gl.shaderSource(o,src);gl.compileShader(o);if(!gl.getShaderParameter(o,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(o));return o;}
+    var pr;try{pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,vs));gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,fs));gl.linkProgram(pr);if(!gl.getProgramParameter(pr,gl.LINK_STATUS))throw new Error("link");gl.useProgram(pr);}catch(e){c.remove();return;}
+    var b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+    var loc=gl.getAttribLocation(pr,"p");gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
+    var uR=gl.getUniformLocation(pr,"r"),uT=gl.getUniformLocation(pr,"t"),uM=gl.getUniformLocation(pr,"m");
+    var mx=0,my=0,tx=0,ty=0,vis=true,t0=performance.now();
+    function size(){var s=.5;c.width=Math.max(2,Math.round(c.clientWidth*s));c.height=Math.max(2,Math.round(c.clientHeight*s));gl.viewport(0,0,c.width,c.height);}
+    function draw(now){mx+=(tx-mx)*.04;my+=(ty-my)*.04;gl.uniform2f(uR,c.width,c.height);gl.uniform1f(uT,reduce?14:(now-t0)/1000+14);gl.uniform2f(uM,mx*.9,-my*.9);gl.drawArrays(gl.TRIANGLES,0,3);}
+    fluidDraw=function(){size();draw(performance.now());};
+    size();
+    addEventListener("resize",function(){size();if(reduce)draw(0);});
+    addEventListener("pointermove",function(e){tx=e.clientX/innerWidth-.5;ty=e.clientY/innerHeight-.5;},{passive:true});
+    if("IntersectionObserver" in window)new IntersectionObserver(function(es){vis=es[0].isIntersecting;}).observe(c);
+    function loop(now){if(vis&&!document.hidden&&c.offsetParent!==null)draw(now);requestAnimationFrame(loop);}
+    if(reduce)draw(0);else requestAnimationFrame(loop);
+  })();
+
+  /* ---------- Bandeaux défilants ---------- */
+  var marquees=$$("[data-marquee]").map(function(el){var tr=$(".mq-track",el);
+    [].slice.call(tr.children).forEach(function(ch){var k=ch.cloneNode(true);k.setAttribute("aria-hidden","true");$$("button",k).forEach(function(b){b.tabIndex=-1;});if(k.matches&&k.matches("button"))k.tabIndex=-1;tr.appendChild(k);});
+    var m={el:el,tr:tr,x:0,dir:+(el.getAttribute("data-dir")||1),sp:+(el.getAttribute("data-mspeed")||.6),skew:el.hasAttribute("data-skew"),hover:false,half:0};
+    el.addEventListener("pointerenter",function(){m.hover=true;});el.addEventListener("pointerleave",function(){m.hover=false;});return m;});
+
+  /* ---------- Méthode en défilement horizontal ---------- */
+  var hs=$("#methode"),hsTrack=hs&&$(".hs-track",hs),hsBar=hs&&$(".hs-progress i",hs),hsDist=0;
+  function hsLayout(){if(!hs||hs.offsetParent===null)return;var flat=innerWidth<820||reduce;hs.classList.toggle("flat",flat);
+    if(flat){hs.style.height="";hsTrack.style.transform="";return;}
+    hsDist=Math.max(0,hsTrack.scrollWidth-innerWidth);hs.style.height=(innerHeight+hsDist)+"px";}
+  function measure(){marquees.forEach(function(m){m.half=m.tr.scrollWidth/2;});hsLayout();}
+  addEventListener("resize",measure);addEventListener("load",measure);
+
+  /* ---------- Boucle d'animation liée au défilement ---------- */
+  var lastY=scrollY,vel=0,cards=$$(".pcard"),par=$$("[data-speed]"),pr=$("#progress");
+  function frame(){
+    var y=scrollY,d=y-lastY;lastY=y;vel+=(d-vel)*.12;
+    var h=document.documentElement.scrollHeight-innerHeight;pr.style.transform="scaleX("+(h>0?Math.min(1,y/h):0)+")";
+    if(!reduce){
+      marquees.forEach(function(m){if(!m.half||m.el.offsetParent===null)return;
+        var v=m.dir*(m.sp*(m.hover?.15:1)+vel*.22);m.x-=v;if(m.x<=-m.half)m.x+=m.half;if(m.x>0)m.x-=m.half;
+        var sk=m.skew?Math.max(-9,Math.min(9,-vel*.35)):0;m.tr.style.transform="translate3d("+m.x+"px,0,0) skewX("+sk+"deg)";});
+      if(hs&&!hs.classList.contains("flat")&&hs.offsetParent!==null){var r=hs.getBoundingClientRect(),span=hs.offsetHeight-innerHeight||1,p=Math.min(1,Math.max(0,-r.top/span));
+        hsTrack.style.transform="translate3d("+(-p*hsDist)+"px,0,0)";hsBar.style.transform="scaleX("+p+")";}
+      for(var i=0;i<cards.length-1;i++){var a=cards[i];if(a.offsetParent===null)break;var ra=a.getBoundingClientRect(),rb=cards[i+1].getBoundingClientRect();
+        var q=Math.min(1,Math.max(0,1-(rb.top-ra.top)/(ra.height||1)));a.style.transform="scale("+(1-q*.07)+")";a.style.filter="brightness("+(1-q*.3)+")";}
+      par.forEach(function(el){if(el.offsetParent===null)return;var r2=el.getBoundingClientRect();if(r2.bottom<0||r2.top>innerHeight)return;var s=+el.getAttribute("data-speed");el.style.transform="translate3d(0,"+((r2.top+r2.height/2-innerHeight/2)*-s)+"px,0)";});
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  /* ---------- Fond qui change de couleur ---------- */
+  if("IntersectionObserver" in window){document.documentElement.classList.add("morph");
+    var mio=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)document.body.style.backgroundColor=e.target.getAttribute("data-bg");});},{rootMargin:"-50% 0px -50% 0px"});
+    $$("[data-bg]").forEach(function(el){mio.observe(el);});}
+
+  /* ---------- Apparitions et compteurs ---------- */
+  function fmt(n,dec){var s=n.toFixed(dec).split(".");s[0]=s[0].replace(/\B(?=(\d{3})+(?!\d))/g,NB);return s.join(",");}
+  function count(el){var to=parseFloat(el.getAttribute("data-count")),dec=+(el.getAttribute("data-dec")||0),pre=(el.getAttribute("data-pre")||"").replace(/ /g,NB),suf=(el.getAttribute("data-suf")||"").replace(/ /g,NB),t0=performance.now();
+    function st(t){var p=Math.min(1,(t-t0)/1500),e=1-Math.pow(1-p,4);el.textContent=pre+fmt(to*e,dec)+suf;if(p<1)requestAnimationFrame(st);}requestAnimationFrame(st);}
+  var seen=typeof WeakSet!=="undefined"?new WeakSet():null;
+  var io="IntersectionObserver" in window?new IntersectionObserver(function(es){es.forEach(function(e){if(!e.isIntersecting)return;var el=e.target;io.unobserve(el);el.classList.remove("pre");el.classList.add("in");
+    if(el.hasAttribute("data-count"))count(el);$$("[data-count]",el).forEach(count);});},{rootMargin:"0px 0px -8% 0px"}):null;
+  var RV=".rv,.split-words,.chapter .panel,.chapter .figure,.chapter .tbl,.chapter .gantt,.chapter .signal,.chapter .ch-h,.chapter .ssc > div,.chapter .chan > div,.chapter .timeline > div,.chapter .cal > div,.chapter .flow .fr,.job";
+  function arm(root){if(!root)return;$$(RV,root).forEach(function(el){if(seen&&seen.has(el))return;if(seen)seen.add(el);
+    var r=el.getBoundingClientRect();
+    if(!io||reduce||r.top<innerHeight*.94){el.classList.add("in");return;}
+    el.classList.add("pre");io.observe(el);});}
+
+  /* ---------- Curseur et boutons aimantés ---------- */
+  var cur=$("#cursor");
+  if(fine&&!reduce&&cur){var lab=$("span",cur),cx=-100,cy=-100,px=-100,py=-100;
+    addEventListener("pointermove",function(e){cx=e.clientX;cy=e.clientY;cur.style.opacity=1;},{passive:true});
+    document.addEventListener("pointerleave",function(){cur.style.opacity=0;});
+    (function mv(){px+=(cx-px)*.22;py+=(cy-py)*.22;cur.style.transform="translate3d("+px+"px,"+py+"px,0)";requestAnimationFrame(mv);})();
+    document.addEventListener("pointerover",function(e){var t=e.target.closest&&e.target.closest("[data-cursor],[data-zoom],a,button,.g-bar");cur.classList.remove("big","link");if(!t)return;
+      var l=t.getAttribute("data-cursor");if(l||t.hasAttribute("data-zoom")){lab.textContent=l||"Voir";cur.classList.add("big");}else cur.classList.add("link");});
+    $$(".btn,.menu-btn,.pcard .go i").forEach(function(b){b.addEventListener("pointermove",function(e){var r=b.getBoundingClientRect();b.style.transform="translate("+((e.clientX-r.left-r.width/2)*.25)+"px,"+((e.clientY-r.top-r.height/2)*.35)+"px)";});
+      b.addEventListener("pointerleave",function(){b.style.transform="";});});
+  }else if(cur)cur.remove();
+
+  /* ---------- Menu plein écran ---------- */
+  var menu=$("#menu"),mb=$("#menu-btn");menu.inert=true;
+  function setMenu(o){menu.classList.toggle("open",o);menu.setAttribute("aria-hidden",o?"false":"true");menu.inert=!o;mb.setAttribute("aria-expanded",o?"true":"false");mb.textContent=o?"Fermer":"Menu";document.documentElement.classList.toggle("lock",o);}
+  mb.addEventListener("click",function(){setMenu(!menu.classList.contains("open"));});
+  $$("a",menu).forEach(function(a){a.addEventListener("click",function(){setMenu(false);});});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape"&&menu.classList.contains("open"))setMenu(false);});
+
+  /* ---------- Info-bulle ---------- */
+  var tip=$("#tip");
+  function showTip(el,X,Y){var p=el.getAttribute("data-tip").split("|");tip.innerHTML="<b>"+p[0]+"</b>"+p.slice(1).join("<br>");tip.hidden=false;var r=tip.getBoundingClientRect();var Lf=Math.min(X+16,innerWidth-r.width-10),T=Y+18;if(T+r.height>innerHeight-8)T=Y-r.height-12;tip.style.left=Math.max(8,Lf)+"px";tip.style.top=T+"px";}
+  function bindTip(g){g.addEventListener("mousemove",function(e){var el=e.target.closest("[data-tip]");if(el)showTip(el,e.clientX,e.clientY);else tip.hidden=true;});g.addEventListener("mouseleave",function(){tip.hidden=true});g.addEventListener("focusin",function(e){var el=e.target.closest("[data-tip]");if(el){var r=el.getBoundingClientRect();showTip(el,r.left,r.bottom);}});g.addEventListener("focusout",function(){tip.hidden=true});}
+  addEventListener("scroll",function(){tip.hidden=true},{passive:true});
+  function fr(s){var p=s.split("-");return p[2]+"/"+p[1];}
+
+  /* ---------- Gantt Nettivert ---------- */
+  (function(){
+    var T=[["Axe 1 · Écologie prouvée"],
+      ["A1.1","Plateforme de marque","2027-01-04","2027-01-08","2027-01-12","a1","Dirigeant","aucune","600 000"],
+      ["A1.2","Dossier de preuves","2027-01-04","2027-01-13","2027-01-15","a1","Resp. opérations","aucune","300 000"],
+      ["A1.3","Refonte du site","2027-01-18","2027-02-05","2027-02-11","a1","Resp. commercial","A1.1, A1.2","1 800 000"],
+      ["A1.4","Calendrier LinkedIn","2027-01-13","2027-01-19","2027-01-21","a1","Resp. commercial","A1.1","450 000"],
+      ["Axe 2 · Offre premium"],
+      ["A2.1","Offre premium","2027-01-13","2027-01-20","2027-01-22","a2","Dirigeant","A1.1","300 000"],
+      ["A2.2","Dossier et devis type","2027-01-25","2027-01-29","2027-02-02","a2","Resp. commercial","A2.1, A1.2","250 000"],
+      ["A2.3","Formation de l'équipe","2027-02-03","2027-02-04","2027-02-05","a2","Resp. commercial","A2.2","100 000"],
+      ["A2.4","Campagne de lancement","2027-02-12","2027-02-23","2027-02-25","a2","Dirigeant","A1.3, A2.2, A2.3","1 600 000"],
+      ["Axe 3 · Fidélisation et reconquête"],
+      ["A3.1","CRM et alertes","2027-01-04","2027-01-15","2027-01-20","a3","Assistante admin.","aucune","600 000"],
+      ["A3.2","Enquête de sortie et avis","2027-01-21","2027-01-27","2027-01-29","a3","Assistante admin.","A3.1","150 000"],
+      ["A3.3","Reconquête des 17 clients","2027-02-03","2027-02-12","2027-02-16","a3","Resp. commercial","A2.2, A3.1","250 000"],
+      ["A3.4","Tableau de bord mensuel","2027-01-21","2027-01-26","2027-01-27","a3","Assistante admin.","A3.1","100 000"]];
+    var CL={a1:COL.lagoon,a2:COL.papaya,a3:COL.lilac};
+    var D0=Date.UTC(2027,0,4),N=40;
+    function idx(s){var p=s.split("-");var d=Math.round((Date.UTC(+p[0],p[1]-1,+p[2])-D0)/864e5);return Math.floor(d/7)*5+(d%7);}
+    var wk=["04/01","11/01","18/01","25/01","01/02","08/02","15/02","22/02"];
+    var h='<div class="g-head"><div class="g-lab"><b>Tâche</b></div><div class="g-cols" style="--n:8">'+wk.map(function(w,i){return '<span><b>S'+(i+1)+'</b>'+w+'</span>'}).join("")+'</div></div>';
+    var ms=idx("2027-02-23"),k=0;
+    T.forEach(function(t){
+      if(t.length===1){h+='<div class="g-axe">'+t[0]+'</div>';return;}
+      var s=idx(t[2]),e=idx(t[3]),m=idx(t[4]),c=CL[t[5]],dl=(k++*60)+"ms";
+      var info=t[0]+" · "+t[1]+"|Du "+fr(t[2])+" au "+fr(t[3])+", marge jusqu'au "+fr(t[4])+"|Responsable : "+t[6]+"|Dépend de : "+t[7]+"|Budget : "+t[8]+" FCFA";
+      h+='<div class="g-row"><div class="g-lab"><b>'+t[0]+'</b>'+t[1]+'</div><div class="g-track" style="--n:8">';
+      if(t[0]==="A2.4")h+='<div class="g-ms" style="left:'+(ms/N*100)+'%"></div>';
+      h+='<div class="g-bar" tabindex="0" data-tip="'+info+'" style="--c:'+c+';left:'+(s/N*100)+'%;width:'+((e-s+1)/N*100)+'%;transition-delay:'+dl+'"></div>';
+      if(m>e)h+='<div class="g-bar m" style="--c:'+c+';left:'+((e+1)/N*100)+'%;width:'+((m-e)/N*100)+'%;transition-delay:'+dl+'"></div>';
+      h+='</div></div>';
+    });
+    var g=$("#gantt");g.innerHTML=h;bindTip(g);
+  })();
+
+  /* ---------- Gantt annuel formation ---------- */
+  (function(){
+    var A=[["1","Site web et parcours de conversion","2027-01-04","2027-02-18",13],["2","Acquisition et positionnement premium","2027-01-04","2027-11-08",14],["3","CRM et suivi commercial","2027-01-04","2027-11-22",15],["4","Fidélisation et valeur client","2027-04-05","2027-12-13",15],["5","Réactivation de la base","2027-04-23","2027-12-20",18]];
+    var Y0=Date.UTC(2027,0,1),Y1=Date.UTC(2028,0,1);function pc(s){var p=s.split("-");return (Date.UTC(+p[0],p[1]-1,+p[2])-Y0)/(Y1-Y0)*100;}
+    var M=["Janv.","Févr.","Mars","Avr.","Mai","Juin","Juil.","Août","Sept.","Oct.","Nov.","Déc."];
+    var cols=[COL.lagoon,COL.papaya,COL.lilac,COL.sun,COL.rose];
+    var h='<div class="g-head"><div class="g-lab"><b>Action</b></div><div class="g-cols" style="--n:12">'+M.map(function(m){return "<span><b>"+m+"</b></span>"}).join("")+'</div></div>';
+    A.forEach(function(a,i){var l=pc(a[2]),r=pc(a[3]);
+      h+='<div class="g-row"><div class="g-lab"><b>A'+a[0]+'</b>'+a[1]+'</div><div class="g-track" style="--n:12"><div class="g-bar" tabindex="0" data-tip="Action '+a[0]+' · '+a[1]+'|Du '+fr(a[2])+' au '+fr(a[3])+'/2027|'+a[4]+' micro-tâches" style="--c:'+cols[i]+';left:'+l+'%;width:'+(r-l)+'%;transition-delay:'+(i*90)+'ms"></div></div></div>';});
+    var g=$("#gantt-f");g.innerHTML=h;bindTip(g);
+  })();
+
+  /* ---------- Kanban ---------- */
+  (function(){
+    var K={"À faire":[["a2","A2.3","Former l'équipe à l'argumentaire premium","Resp. commercial","05/02","A2.2"],["a2","A2.4","Lancer l'offre premium par une campagne multicanale","Dirigeant","25/02","A1.3, A2.2, A2.3"],["a3","A3.3","Reconquérir les 17 clients perdus au prix","Resp. commercial","16/02","A2.2, A3.1"]],
+      "En cours":[["a1","A1.3","Refaire le site pour mobile (écologie, références, devis en ligne)","Resp. commercial","11/02","A1.1, A1.2"],["a2","A2.2","Produire le dossier, le devis type et l'argumentaire","Resp. commercial","02/02","A2.1, A1.2"],["a3","A3.2","Lancer l'enquête de sortie et la collecte d'avis","Assistante admin.","29/01","A3.1"],["a3","A3.4","Mettre en place le tableau de bord mensuel","Assistante admin.","27/01","A3.1"]],
+      "Bloqué":[],
+      "Fait":[["a1","A1.1","Redéfinir la plateforme de marque","Dirigeant","12/01",""],["a1","A1.2","Constituer le dossier de preuves écologiques","Resp. opérations","15/01",""],["a1","A1.4","Lancer le calendrier éditorial LinkedIn","Resp. commercial","21/01","A1.1"],["a2","A2.1","Définir l'offre d'entretien premium","Dirigeant","22/01","A1.1"],["a3","A3.1","Mettre en place le CRM avec alertes","Assistante admin.","20/01",""]]};
+    var AX={a1:"Axe 1 · Écologie prouvée",a2:"Axe 2 · Offre premium",a3:"Axe 3 · Fidélisation"},CC={a1:COL.lagoon,a2:COL.papaya,a3:COL.lilac};
+    function render(f){$("#kanban").innerHTML=Object.keys(K).map(function(c){var cards=K[c].filter(function(k){return f==="all"||k[0]===f});
+      return '<div class="col"><div class="col-h">'+c+'<span>'+cards.length+'</span></div>'+(cards.length?cards.map(function(k){return '<div class="kc" style="--c:'+CC[k[0]]+'"><span class="ax">'+AX[k[0]]+'</span><div class="t"><b>'+k[1]+'</b>'+k[2]+'</div><div class="m"><span>'+k[3]+'</span><span>'+k[4]+'</span></div>'+(k[5]?'<div class="dep">Dépend de '+k[5]+'</div>':'')+'</div>'}).join(""):'<div class="empty">Aucune carte</div>')+'</div>';}).join("");}
+    render("all");
+    $$("[data-kf]").forEach(function(b){b.addEventListener("click",function(){$$("[data-kf]").forEach(function(o){o.setAttribute("aria-pressed",o===b?"true":"false")});render(b.getAttribute("data-kf"));});});
+  })();
+
+  /* ---------- Outils ---------- */
+  $("#tools").innerHTML=[["Microsoft Excel",4,"Avancé"],["PowerPoint",4,"Avancé"],["Microsoft Word",4,"Avancé"],["Canva",4,"Avancé"],["Meta Business Suite",3,"Pro"],["Outils Google",3,"Pro"]].map(function(t){var l="";for(var i=0;i<4;i++)l+='<i class="'+(i<t[1]?"on":"")+'"></i>';return '<div class="tool"><span>'+t[0]+'</span><div class="lvl" aria-label="'+t[2]+'">'+l+'</div><span class="lv">'+t[2]+'</span></div>';}).join("");
+
+  /* ---------- Diaporamas ---------- */
+  function deck(el,base,T){var n=T.length,i=0;
+    el.innerHTML='<button class="screen" type="button"><img alt=""></button><div class="bar"><button type="button" data-d="-1" aria-label="Diapositive précédente">←</button><span class="pos"></span><button type="button" data-d="1" aria-label="Diapositive suivante">→</button><span class="t"></span></div><div class="strip">'+T.map(function(x,k){return '<button type="button" data-k="'+k+'" aria-label="Diapositive '+(k+1)+'"><img src="'+base+(k+1)+'.webp" alt="" loading="lazy"></button>'}).join("")+'</div>';
+    var img=$("img",el),scr=$(".screen",el),num=$(".pos",el),tt=$(".t",el),strip=$(".strip",el);
+    function go(k){i=(k+n)%n;var src=base+(i+1)+".webp";img.src=src;img.alt="Diapositive "+(i+1)+" : "+T[i];scr.setAttribute("data-zoom",src);scr.setAttribute("data-cap","Diapositive "+(i+1)+" : "+T[i]);num.textContent=(i+1)+" / "+n;tt.textContent=T[i];$$("button",strip).forEach(function(b,k){b.setAttribute("aria-current",k===i?"true":"false")});}
+    el.addEventListener("click",function(e){var d=e.target.closest("[data-d]"),k=e.target.closest("[data-k]");if(d)go(i+ +d.getAttribute("data-d"));if(k)go(+k.getAttribute("data-k"));});
+    go(0);}
+  deck($("#deck-f"),"img/f-slide-",["Couverture : bilan d'activité d'octobre","Résumé exécutif : chiffre d'affaires, dépenses, résultat net","Résultats par campagne et répartition des dépenses","Analyse : Quoi ? Donc ?","Et maintenant : actions, responsables, échéances","Formules, estimations et sources"]);
+  deck($("#deck-ps"),"img/slide-",["Synthèse du tableau de bord, janvier à octobre 2026","2 indicateurs sur 5 sont atteints","Quoi : les départs dépassent les signatures","Donc : le frein est commercial, pas le coût d'acquisition","Et maintenant : cinq actions d'ici fin février 2027"]);
+
+  /* ---------- Visionneuse ---------- */
+  var lb=$("#lb"),li=$("#lb-img"),lc=$("#lb-cap");
+  document.addEventListener("click",function(e){var b=e.target.closest("[data-zoom]");if(!b)return;li.src=b.getAttribute("data-zoom");li.alt=b.getAttribute("data-cap")||"";lc.textContent=b.getAttribute("data-cap")||"";if(lb.showModal)lb.showModal();else lb.setAttribute("open","");});
+  $("#lb-close").addEventListener("click",function(){lb.close()});
+  lb.addEventListener("click",function(e){if(e.target===lb)lb.close()});
+
+  /* ---------- Copier ---------- */
+  document.addEventListener("click",function(e){var b=e.target.closest(".copy[data-copy]");if(!b)return;var v=b.getAttribute("data-copy");
+    function sel(){var t=b.previousElementSibling,r=document.createRange();r.selectNodeContents(t);var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent="Sélectionné";}
+    function done(){b.textContent="Copié";setTimeout(function(){b.textContent="Copier"},1600);}
+    try{navigator.clipboard.writeText(v).then(done,sel);}catch(err){sel();}});
+
+  /* ---------- Pages et transitions ---------- */
+  var views=$$("[data-view]"),links=$$(".nav a,#menu a"),pending=null,first=true,current=null;
+  function render(id){
+    views.forEach(function(v){v.hidden=v.getAttribute("data-view")!==id});
+    links.forEach(function(a){if(a.getAttribute("data-r")===id)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current");});
+    document.title=TITLES[id];document.documentElement.style.setProperty("--world",WORLD[id]);current=id;
+    document.body.style.backgroundColor=COL.ink;
+    measure();if(fluidDraw&&id==="accueil")fluidDraw();
+    var view=$('[data-view="'+id+'"]'),el=pending&&document.getElementById(pending);pending=null;
+    if(el)el.scrollIntoView({behavior:"auto"});else window.scrollTo(0,0);
+    requestAnimationFrame(function(){arm(view);});
+  }
+  function show(){var id=(location.hash||"").slice(1);if(!TITLES[id])id="accueil";
+    if(first||reduce||id===current){first=false;render(id);return;}
+    var w=$("#wipe");w.style.setProperty("--wc",WORLD[id]);$("#wipe-t").textContent=NAMES[id];w.className="cover";
+    setTimeout(function(){render(id);w.className="cover leave";setTimeout(function(){w.className="";},700);},520);}
+  function go(view,sub){pending=sub||null;if(location.hash.slice(1)!==view)location.hash=view;else show();}
+  addEventListener("hashchange",show);
+  document.addEventListener("click",function(e){var b=e.target.closest("[data-go]");if(b){e.preventDefault();go(b.getAttribute("data-go"),b.getAttribute("data-sub"));}
+    var c=e.target.closest("[data-to]");if(c){var el=document.getElementById(c.getAttribute("data-to"));if(el)el.scrollIntoView({behavior:reduce?"auto":"smooth"});}});
+  show();
+
+  /* ---------- Étape active dans les pages de projet ---------- */
+  function onScroll(){$$("[data-chips]").forEach(function(ch){if(ch.closest("[hidden]"))return;var btns=$$("[data-to]",ch),cur2=null;btns.forEach(function(b){var s=document.getElementById(b.getAttribute("data-to"));if(s&&s.getBoundingClientRect().top<220)cur2=b;});
+      btns.forEach(function(b){b.classList.toggle("on",b===cur2)});
+      if(cur2&&ch._cur!==cur2){ch._cur=cur2;var w=cur2.parentNode;w.scrollTo({left:cur2.offsetLeft-w.clientWidth/2+cur2.clientWidth/2,behavior:"smooth"});}});}
+  addEventListener("scroll",onScroll,{passive:true});onScroll();
+
+  /* ---------- Navigation rapide (Ctrl K) ---------- */
+  var CMD=[["Accueil","accueil",null,"Page"],["La méthode en six phases","accueil","methode","Accueil"],["Formation : les 11 livrables","formation",null,"Page"],["Cahier des charges e-commerce","formation","f-cadrer","Formation"],["Plateforme de marque","formation","f-marque","Formation"],["Rapport d'audit 360°","formation","f-audit","Formation"],["Plan annuel, Gantt 2027 et budget","formation","f-plan","Formation"],["Lancement 360° et rétro-planning","formation","f-lancer","Formation"],["Tableau de bord et rapport d'activité","formation","f-piloter","Formation"],["Nettivert : l'étude de cas","nettivert",null,"Page"],["Nettivert · Segments et objectifs","nettivert","c-contexte","Nettivert"],["Nettivert · Audit et diagnostic","nettivert","c-comprendre","Nettivert"],["Nettivert · Plateforme de marque","nettivert","c-positionner","Nettivert"],["Nettivert · Gantt et budget de 7,15 M FCFA","nettivert","c-planifier","Nettivert"],["Nettivert · Brief créatif et Kanban","nettivert","c-coordonner","Nettivert"],["Nettivert · Lancement phygital","nettivert","c-lancer","Nettivert"],["Nettivert · Indicateurs et ROI","nettivert","c-piloter","Nettivert"],["Parcours et expérience","parcours",null,"Page"],["Contact","contact",null,"Page"]];
+  var pal=$("#pal"),q=$("#pal-q"),ul=$("#pal-list"),sel=0,res=[];
+  function norm(s){return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");}
+  function draw(){var v=norm(q.value.trim());res=CMD.filter(function(c){return !v||norm(c[0]+" "+c[3]).indexOf(v)>-1});sel=Math.min(sel,Math.max(0,res.length-1));
+    ul.innerHTML=res.length?res.map(function(c,i){return '<li role="option" data-i="'+i+'" aria-selected="'+(i===sel)+'"><span>'+c[0]+'</span><small>'+c[3]+'</small></li>'}).join(""):'<li class="none">Aucun résultat. Essayez « audit » ou « contact ».</li>';}
+  function openPal(){q.value="";sel=0;draw();if(pal.showModal)pal.showModal();else pal.setAttribute("open","");setTimeout(function(){q.focus()},10);}
+  function pick(i){var c=res[i];if(!c)return;pal.close();go(c[1],c[2]);}
+  $("#open-pal").addEventListener("click",openPal);
+  document.addEventListener("keydown",function(e){if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="k"){e.preventDefault();pal.open?pal.close():openPal();}});
+  q.addEventListener("input",function(){sel=0;draw()});
+  q.addEventListener("keydown",function(e){if(e.key==="ArrowDown"){e.preventDefault();sel=Math.min(res.length-1,sel+1);draw();}else if(e.key==="ArrowUp"){e.preventDefault();sel=Math.max(0,sel-1);draw();}else if(e.key==="Enter"){e.preventDefault();pick(sel);}});
+  ul.addEventListener("click",function(e){var li2=e.target.closest("[data-i]");if(li2)pick(+li2.getAttribute("data-i"));});
+  pal.addEventListener("click",function(e){if(e.target===pal)pal.close()});
+})();
+</script>
+
+</body>
+</html>
